@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PixiParser", "PixiParser\PixiParser.csproj", "{E193BA89-5529-4708-B1A6-D0896C482EFA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PixiParser.Tests", "PixiParser.Tests\PixiParser.Tests.csproj", "{FAFFE547-686D-4161-8519-9246CF6A4CC4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E193BA89-5529-4708-B1A6-D0896C482EFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E193BA89-5529-4708-B1A6-D0896C482EFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E193BA89-5529-4708-B1A6-D0896C482EFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E193BA89-5529-4708-B1A6-D0896C482EFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAFFE547-686D-4161-8519-9246CF6A4CC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAFFE547-686D-4161-8519-9246CF6A4CC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAFFE547-686D-4161-8519-9246CF6A4CC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAFFE547-686D-4161-8519-9246CF6A4CC4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {67324613-A805-4DC2-8298-F4BA55CD8FCC}
+	EndGlobalSection
+EndGlobal
