@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/PixiEditor/Assets/main/Images/PixiParserLogoWithName.png?token=AKZWRDLL3CGHGOPVF2PLFH274ELKM"/>
+<img src="https://user-images.githubusercontent.com/45312141/102829812-2e1c1c80-43e8-11eb-889c-0043e66e5fe5.png" width="700" />
 
 ---
 
