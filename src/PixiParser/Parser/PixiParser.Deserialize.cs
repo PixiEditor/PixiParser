@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
-using PixiEditor.Parser.Exceptions;
 using MessagePack;
 
 namespace PixiEditor.Parser
@@ -34,17 +33,36 @@ namespace PixiEditor.Parser
                 throw new InvalidFileException("This does not seem to be a .pixi file");
             }
 
-            // First four bytes are message pack lenght
-            byte[] messagePackLenghtBytes = span.Slice(0, 4).ToArray();
-            int messagePackLenght = BitConverter.ToInt32(messagePackLenghtBytes, 0);
+            int messagePackLenght;
+            byte[] messagePackBytes;
 
-            // At the fith byte the message pack begins
-            byte[] messagePackBytes = span.Slice(4, messagePackLenght).ToArray();
+            try
+            {
+                // First four bytes are message pack lenght
+                byte[] messagePackLenghtBytes = span.Slice(0, 4).ToArray();
+                messagePackLenght = BitConverter.ToInt32(messagePackLenghtBytes, 0);
+
+                // At the fith byte the message pack begins
+                messagePackBytes = span.Slice(4, messagePackLenght).ToArray();
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                throw new InvalidFileException("This does not seem to be a .pixi file");
+            }
 
             int pos = messagePackLenght + 4;
             int i = 0;
 
-            SerializableDocument document = MessagePackSerializer.Deserialize<SerializableDocument>(messagePackBytes);
+            SerializableDocument document;
+
+            try
+            {
+                document = MessagePackSerializer.Deserialize<SerializableDocument>(messagePackBytes);
+            }
+            catch (MessagePackSerializationException)
+            {
+                throw new InvalidFileException("Message Pack could not be deserialize");
+            }
 
             document.Swatches = Helpers.BytesToSwatches(document.SwatchesData);
 

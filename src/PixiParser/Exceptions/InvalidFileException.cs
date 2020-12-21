@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PixiEditor.Parser.Exceptions
+namespace PixiEditor.Parser
 {
 
     [Serializable]

@@ -24,7 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="TestFile.pixi">
+    <None Update="CorruptedPixiFile.pixi">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="OldPixiFile.pixi">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

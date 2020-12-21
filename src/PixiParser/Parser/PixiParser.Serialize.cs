@@ -51,6 +51,11 @@ namespace PixiEditor.Parser
                 final.AddRange(pngData);
             }
 
+            if (document.Layers.Length == 0)
+            {
+                final.AddRange(BitConverter.GetBytes(0));
+            }
+
             return final.ToArray();
         }
 

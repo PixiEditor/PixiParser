@@ -39,15 +39,21 @@ namespace PixiEdtior.Tests
         [Fact]
         public void DetectOldFile()
         {
-            Assert.Throws<OldFileFormatException>(delegate { PixiParser.Deserialize("./TestFile.pixi"); });
+            Assert.Throws<OldFileFormatException>(delegate { PixiParser.Deserialize("./OldPixiFile.pixi"); });
         }
 
         [Fact]
         public void ParsesOldFile()
         {
-            using FileStream stream = new FileStream("./TestFile.pixi", FileMode.Open, FileAccess.Read);
+            using FileStream stream = new FileStream("./OldPixiFile.pixi", FileMode.Open, FileAccess.Read);
 
             PixiParser.DeserializeOld(stream);
+        }
+
+        [Fact]
+        public void DetectCorruptedFile()
+        {
+            Assert.Throws<InvalidFileException>(delegate { PixiParser.Deserialize("./CorruptedPixiFile.pixi"); });
         }
     }
 }
