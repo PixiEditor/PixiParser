@@ -76,7 +76,7 @@ namespace PixiEditor.Parser
         /// <param name="document">The document to serialize.</param>
         public static void Serialize(SerializableDocument document, string path)
         {
-            using FileStream stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write);
+            using FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write);
 
             Serialize(document, stream);
         }

@@ -67,7 +67,7 @@ namespace PixiEditor.Parser
             document.Swatches = Helpers.BytesToSwatches(document.SwatchesData);
 
             // Deserialize layer data
-            while (pos < span.Length)
+            while (pos < span.Length && document.Layers.Length > i)
             {
                 SerializableLayer layer = document.Layers[i];
                 layer.MaxWidth = document.Width;
