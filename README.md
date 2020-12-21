@@ -1,5 +1,6 @@
-# PixiParser
-A parser for serializing and deserializing .pixi files used by [PixiEditor](https://github.com/PixiEditor/PixiEditor)
+<img src="https://raw.githubusercontent.com/PixiEditor/Assets/main/Images/PixiParserLogoWithName.png?token=AKZWRDLL3CGHGOPVF2PLFH274ELKM"/>
+
+---
 
 ## Getting started
 
