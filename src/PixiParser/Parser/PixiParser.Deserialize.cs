@@ -120,10 +120,15 @@ namespace PixiEditor.Parser
         /// Deserializes to a <see cref="SerializableDocument"/>.
         /// </summary>
         /// <param name="path">The stream to deserialize from</param>
+        /// <param name="streamPosition">From where to start reading the stream, use null to start from current position.</param>
         /// <returns>The deserialized Document.</returns>
-        public static SerializableDocument Deserialize(Stream stream)
+        public static SerializableDocument Deserialize(Stream stream, int? streamPosition = 0)
         {
             Span<byte> span = new Span<byte>(new byte[stream.Length]);
+            if (streamPosition.HasValue)
+            {
+                stream.Position = streamPosition.Value;
+            }
             stream.Read(span);
 
             return Deserialize(span);
