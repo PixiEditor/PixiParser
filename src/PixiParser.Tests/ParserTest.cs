@@ -1,9 +1,8 @@
 using System;
 using System.IO;
-using PixiEditor.Parser;
 using Xunit;
 
-namespace PixiEdtior.Tests
+namespace PixiEditor.Parser.Tests
 {
     public class ParserTest
     {
