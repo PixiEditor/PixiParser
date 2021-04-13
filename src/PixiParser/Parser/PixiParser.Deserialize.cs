@@ -74,8 +74,7 @@ namespace PixiEditor.Parser
                 layer.MaxHeight = document.Height;
 
                 // Layer data lenght
-                byte[] layerLenghtBytes = span.Slice(pos, 4).ToArray();
-                int layerLenght = BitConverter.ToInt32(layerLenghtBytes, 0);
+                int layerLenght = BitConverter.ToInt32(span.Slice(pos, 4));
 
                 if (layerLenght == 0)
                 {
