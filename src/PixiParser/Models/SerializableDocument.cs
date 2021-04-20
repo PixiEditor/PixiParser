@@ -1,4 +1,5 @@
 ﻿using MessagePack;
+using PixiParser.Parser;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,6 +24,9 @@ namespace PixiEditor.Parser
 
         [Key(3)]
         public SerializableLayer[] Layers { get; set; }
+
+        [Key(4)]
+        public SerializableGuidStructureItem[] Groups { get; set; }
 
         public IEnumerator<SerializableLayer> GetEnumerator()
         {

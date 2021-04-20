@@ -8,13 +8,13 @@
     <Company>PixiEditor</Company>
     <Authors>CPK, Krzysztof Krysiński</Authors>
     <Description>A Parser for serializing and deserializing .pixi files used by PixiEditor</Description>
-    <Copyright>PixiEditor © 2020</Copyright>
+    <Copyright>PixiEditor © 2021</Copyright>
     <RepositoryUrl>https://github.com/PixiEditor/PixiParser</RepositoryUrl>
     <PackageTags>parser</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>PixiParserLogo.png</PackageIcon>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <Version>1.0.1.1</Version>
+    <Version>1.0.2.0</Version>
   </PropertyGroup>
 
 	<ItemGroup>

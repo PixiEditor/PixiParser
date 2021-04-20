@@ -25,9 +25,9 @@ namespace PixiEdtior.Tests
                 OffsetX = 0, OffsetY = 0,
                 Opacity = 1 } };
 
-            byte[] serialized = PixiParser.Serialize(document);
+            byte[] serialized = PixiEditor.Parser.PixiParser.Serialize(document);
 
-            SerializableDocument deserializedDocument = PixiParser.Deserialize(serialized);
+            SerializableDocument deserializedDocument = PixiEditor.Parser.PixiParser.Deserialize(serialized);
 
             Assert.Equal(document.Height, deserializedDocument.Height);
             Assert.Equal(document.Width, deserializedDocument.Width);
@@ -39,7 +39,7 @@ namespace PixiEdtior.Tests
         [Fact]
         public void DetectOldFile()
         {
-            Assert.Throws<OldFileFormatException>(delegate { PixiParser.Deserialize("./OldPixiFile.pixi"); });
+            Assert.Throws<OldFileFormatException>(delegate { PixiEditor.Parser.PixiParser.Deserialize("./OldPixiFile.pixi"); });
         }
 
         [Fact]
@@ -47,13 +47,13 @@ namespace PixiEdtior.Tests
         {
             using FileStream stream = new FileStream("./OldPixiFile.pixi", FileMode.Open, FileAccess.Read);
 
-            PixiParser.DeserializeOld(stream);
+            PixiEditor.Parser.PixiParser.DeserializeOld(stream);
         }
 
         [Fact]
         public void DetectCorruptedFile()
         {
-            Assert.Throws<InvalidFileException>(delegate { PixiParser.Deserialize("./CorruptedPixiFile.pixi"); });
+            Assert.Throws<InvalidFileException>(delegate { PixiEditor.Parser.PixiParser.Deserialize("./CorruptedPixiFile.pixi"); });
         }
     }
 }

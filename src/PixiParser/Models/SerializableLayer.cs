@@ -20,10 +20,10 @@ namespace PixiEditor.Parser
         [Key(1)]
         public int Height { get; set; }
 
-        [IgnoreMember]
+        [Key(7)]
         public int MaxWidth { get; set; }
 
-        [IgnoreMember]
+        [Key(8)]
         public int MaxHeight { get; set; }
 
         [IgnoreMember]
@@ -62,7 +62,7 @@ namespace PixiEditor.Parser
 
         public override int GetHashCode()
         {
-            HashCode hashCode = default(HashCode);
+            HashCode hashCode = default;
             hashCode.Add(Name);
             hashCode.Add(Width);
             hashCode.Add(Height);
