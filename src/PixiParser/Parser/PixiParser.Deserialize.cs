@@ -22,6 +22,8 @@ namespace PixiEditor.Parser
             {
                 Span<byte> oldFileFormat = span.Slice(22, 8);
 
+                oldFileFormat.Reverse();
+
                 // The old format always begins with the same bytes
                 if (BitConverter.ToUInt64(oldFileFormat) == oldFormatIdentifier)
                 {

@@ -38,7 +38,7 @@ namespace PixiEditor.Parser.Tests
         [Fact]
         public void DetectOldFile()
         {
-            Assert.Throws<OldFileFormatException>(delegate { PixiParser.Deserialize("./OldPixiFile.pixi"); });
+            Assert.Throws<OldFileFormatException>(() => PixiParser.Deserialize("./OldPixiFile.pixi"));
         }
 
         [Fact]

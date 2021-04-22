@@ -20,7 +20,7 @@ namespace PixiEditor.Parser.Benchmarks
         [GlobalSetup]
         public void Setup()
         {
-            benchmarkDocument = PixiParser.Serialize(Helper.CreateDocument(Size, Layers));
+            benchmarkDocument = PixiParser.Serialize(Helper.CreateDocument(Size, Layers)).ToArray();
         }
 
         [Benchmark]
