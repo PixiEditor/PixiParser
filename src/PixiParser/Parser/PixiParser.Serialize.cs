@@ -16,9 +16,7 @@ namespace PixiEditor.Parser
         {
             BinaryWriter writer = new BinaryWriter(stream);
 
-            document.SwatchesData = Helpers.SwatchesToBytes(document.Swatches);
-
-            byte[] messagePack = MessagePackSerializer.Serialize(document);
+            byte[] messagePack = MessagePackSerializer.Serialize(document, MessagePack.Resolvers.StandardResolverAllowPrivate.Options);
 
             writer.Write(messagePack.Length);
             writer.Write(messagePack);

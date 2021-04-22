@@ -20,10 +20,10 @@ namespace PixiEditor.Parser
         public int Height { get; set; }
 
         [DataMember(Order = 2)]
-        public byte[] SwatchesData { get; set; }
+        private byte[] SwatchesData { get; set; }
 
         [IgnoreDataMember]
-        public Tuple<byte, byte, byte, byte>[] Swatches { get; set; }
+        public Tuple<byte, byte, byte, byte>[] Swatches { get => Helpers.BytesToSwatches(SwatchesData); set => SwatchesData = Helpers.SwatchesToBytes(value); }
 
         [DataMember(Order = 3)]
         public SerializableLayer[] Layers { get; set; }

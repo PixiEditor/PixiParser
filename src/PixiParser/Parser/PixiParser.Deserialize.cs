@@ -46,7 +46,9 @@ namespace PixiEditor.Parser
 
             try
             {
-                document = ParseMessagePack(messagePackBytes);
+                document = MessagePackSerializer.Deserialize<SerializableDocument>(
+                    messagePackBytes.ToArray(), 
+                    MessagePack.Resolvers.StandardResolverAllowPrivate.Options);
             }
             catch (MessagePackSerializationException)
             {
@@ -129,14 +131,6 @@ namespace PixiEditor.Parser
             pos += messagePackLenght + 4;
 
             return messagePackBytes;
-        }
-
-        private static SerializableDocument ParseMessagePack(Span<byte> bytes)
-        {
-            var document = MessagePackSerializer.Deserialize<SerializableDocument>(bytes.ToArray());
-            document.Swatches = Helpers.BytesToSwatches(document.SwatchesData);
-
-            return document;
         }
 
         private static void ParseLayerPNGs(ref SerializableDocument document, Span<byte> span, ref int pos)
