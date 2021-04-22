@@ -10,6 +10,9 @@ namespace PixiEditor.Parser
     [DataContract]
     public class SerializableDocument : IEnumerable<SerializableLayer>
     {
+        [DataMember(Order = 4)]
+        public Version FileVersion { get; set; } = new Version(1, 1);
+
         [DataMember(Order = 0)]
         public int Width { get; set; }
 
