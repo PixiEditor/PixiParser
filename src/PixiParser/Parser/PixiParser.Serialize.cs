@@ -33,7 +33,7 @@ namespace PixiEditor.Parser
         /// </summary>
         /// <param name="document">The document to serialize.</param>
         /// <returns>The serialized bytes.</returns>
-        public static byte[] Serialize(SerializableDocument document)
+        public static Span<byte> Serialize(SerializableDocument document)
         {
             MemoryStream stream = new MemoryStream();
 
@@ -41,11 +41,11 @@ namespace PixiEditor.Parser
 
             stream.Seek(0, SeekOrigin.Begin);
 
-            byte[] buffer = new byte[stream.Length];
+            Span<byte> span = new Span<byte>();
 
-            stream.Read(buffer, 0, buffer.Length);
+            stream.Read(span);
 
-            return buffer;
+            return span;
         }
 
         /// <summary>
