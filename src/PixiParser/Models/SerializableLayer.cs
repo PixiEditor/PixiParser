@@ -4,41 +4,42 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace PixiEditor.Parser
 {
     [Serializable]
-    [MessagePackObject]
+    [DataContract]
     public class SerializableLayer
     {
-        [Key(4)]
+        [DataMember(Order = 4)]
         public string Name { get; set; }
 
-        [Key(0)]
+        [DataMember(Order = 0)]
         public int Width { get; set; }
 
-        [Key(1)]
+        [DataMember(Order = 1)]
         public int Height { get; set; }
 
-        [IgnoreMember]
+        [IgnoreDataMember]
         public int MaxWidth { get; set; }
 
-        [IgnoreMember]
+        [IgnoreDataMember]
         public int MaxHeight { get; set; }
 
-        [IgnoreMember]
+        [IgnoreDataMember]
         public byte[] BitmapBytes { get; set; }
 
-        [Key(5)]
+        [DataMember(Order = 5)]
         public bool IsVisible { get; set; }
 
-        [Key(2)]
+        [DataMember(Order = 2)]
         public int OffsetX { get; set; }
 
-        [Key(3)]
+        [DataMember(Order = 3)]
         public int OffsetY { get; set; }
 
-        [Key(6)]
+        [DataMember(Order = 6)]
         public float Opacity { get; set; }
 
         public Bitmap ToBitmap()
