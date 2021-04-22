@@ -24,7 +24,7 @@ namespace PixiEditor.Parser.Tests
                 OffsetX = 0, OffsetY = 0,
                 Opacity = 1 } };
 
-            byte[] serialized = PixiParser.Serialize(document);
+            Span<byte> serialized = PixiParser.Serialize(document);
 
             SerializableDocument deserializedDocument = PixiParser.Deserialize(serialized);
 

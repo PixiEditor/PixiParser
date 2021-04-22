@@ -17,6 +17,10 @@ namespace PixiEditor.Parser.Benchmarks
             for (int i = 0; i < Layers; i++)
             {
                 var layer = benchmarkDocument.Layers[i] = new SerializableLayer();
+
+                layer.Width = Size;
+                layer.Height = Size;
+
                 layer.BitmapBytes = new byte[Size * Size * 4];
 
                 new Random().NextBytes(layer.BitmapBytes);
