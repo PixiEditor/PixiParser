@@ -18,12 +18,16 @@ namespace PixiEditor.Parser
         /// <returns>The deserialized Document.</returns>
         public static SerializableDocument Deserialize(Span<byte> span)
         {
-            Span<byte> oldFileFormat = span.Slice(22, 8);
-
-            // The old format always begins with the same bytes
-            if (BitConverter.ToUInt64(oldFileFormat) == oldFormatIdentifier)
+            if (span.Length > 40)
             {
-                throw new OldFileFormatException("This is a old .pixi file. Use DeserializeOld() to deserialize it");
+                Span<byte> oldFileFormat = span.Slice(22, 8);
+
+                // The old format always begins with the same bytes
+                if (BitConverter.ToUInt64(oldFileFormat) == oldFormatIdentifier)
+                {
+                    throw new OldFileFormatException("This is a old .pixi file. Use DeserializeOld() to deserialize it");
+                }
+
             }
 
             int pos = 0;

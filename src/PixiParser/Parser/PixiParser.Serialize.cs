@@ -39,7 +39,7 @@ namespace PixiEditor.Parser
 
             stream.Seek(0, SeekOrigin.Begin);
 
-            Span<byte> span = new Span<byte>();
+            Span<byte> span = new Span<byte>(new byte[stream.Length]);
 
             stream.Read(span);
 
