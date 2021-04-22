@@ -48,7 +48,8 @@ namespace PixiEditor.Parser
             {
                 document = MessagePackSerializer.Deserialize<SerializableDocument>(
                     messagePackBytes.ToArray(), 
-                    MessagePack.Resolvers.StandardResolverAllowPrivate.Options);
+                    MessagePack.Resolvers.StandardResolverAllowPrivate.Options
+                        .WithSecurity(MessagePackSecurity.UntrustedData));
             }
             catch (MessagePackSerializationException)
             {
