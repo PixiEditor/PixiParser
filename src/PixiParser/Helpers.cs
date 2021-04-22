@@ -7,6 +7,11 @@ namespace PixiEditor.Parser
     {
         public static Tuple<byte, byte, byte, byte>[] BytesToSwatches(byte[] bytes)
         {
+            if (bytes is null)
+            {
+                return Array.Empty<Tuple<byte, byte, byte, byte>>();
+            }
+
             List<Tuple<byte, byte, byte, byte>> swatches = new List<Tuple<byte, byte, byte, byte>>();
 
             // Convert the swatch byte array to a tuple array
@@ -25,6 +30,11 @@ namespace PixiEditor.Parser
 
         public static byte[] SwatchesToBytes(IEnumerable<Tuple<byte, byte, byte, byte>> swatches)
         {
+            if (swatches is null)
+            {
+                return Array.Empty<byte>();
+            }
+
             List<byte> tupleData = new List<byte>();
 
             foreach (var tuple in swatches)
