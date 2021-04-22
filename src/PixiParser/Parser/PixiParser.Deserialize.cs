@@ -41,7 +41,7 @@ namespace PixiEditor.Parser
             }
             catch (ArgumentOutOfRangeException)
             {
-                throw new InvalidFileException("Invalid message pack lenght");
+                throw new InvalidFileException("Invalid message pack length");
             }
 
             SerializableDocument document;
@@ -119,19 +119,19 @@ namespace PixiEditor.Parser
 
         private static Span<byte> GetMessagePackBytes(Span<byte> span, ref int pos)
         {
-            // First four bytes are message pack lenght
-            int messagePackLenght = BitConverter.ToInt32(span.Slice(0, 4));
+            // First four bytes are message pack length
+            int messagePackLength = BitConverter.ToInt32(span.Slice(0, 4));
 
-            // The message pack lenght can't be 0
-            if (messagePackLenght == 0)
+            // The message pack length can't be 0
+            if (messagePackLength == 0)
             {
                 throw new InvalidFileException("This does not seem to be a .pixi file");
             }
 
             // At the fith byte the message pack begins
-            Span<byte> messagePackBytes = span.Slice(4, messagePackLenght);
+            Span<byte> messagePackBytes = span.Slice(4, messagePackLength);
 
-            pos += messagePackLenght + 4;
+            pos += messagePackLength + 4;
 
             return messagePackBytes;
         }
@@ -147,10 +147,10 @@ namespace PixiEditor.Parser
                 layer.MaxWidth = document.Width;
                 layer.MaxHeight = document.Height;
 
-                // Layer data lenght
-                int layerLenght = BitConverter.ToInt32(span.Slice(pos, 4));
+                // Layer data length
+                int layerLength = BitConverter.ToInt32(span.Slice(pos, 4));
 
-                if (layerLenght == 0)
+                if (layerLength == 0)
                 {
                     pos += 4;
                     layer.BitmapBytes = new byte[0];
@@ -161,14 +161,14 @@ namespace PixiEditor.Parser
 
                 try
                 {
-                    layer.BitmapBytes = ParsePNGToRawBytes(span.Slice(pos, layerLenght));
+                    layer.BitmapBytes = ParsePNGToRawBytes(span.Slice(pos, layerLength));
                 }
                 catch (InvalidFileException)
                 {
                     throw new InvalidFileException($"Parsing layer (Index: {i}) failed");
                 }
 
-                pos += layerLenght;
+                pos += layerLength;
                 i++;
             }
         }
