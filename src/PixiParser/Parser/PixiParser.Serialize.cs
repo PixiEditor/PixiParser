@@ -72,7 +72,7 @@ namespace PixiEditor.Parser
 
                 bitmapStream.Seek(0, SeekOrigin.Begin);
 
-                // Layer PNG Data Lenght
+                // Layer PNG Data Length
                 writer.Write((int)bitmapStream.Length);
                 bitmapStream.CopyTo(writer.BaseStream);
             }
