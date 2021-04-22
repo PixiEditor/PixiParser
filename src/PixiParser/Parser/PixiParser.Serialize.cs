@@ -25,30 +25,7 @@ namespace PixiEditor.Parser
             writer.Write(messagePack.Length);
             writer.Write(messagePack);
 
-            foreach (SerializableLayer layer in document)
-            {
-                if (layer.Width * layer.Height == 0)
-                {
-                    writer.Write(0);
-                    continue;
-                }
-
-                using Bitmap bitmap = layer.ToBitmap();
-                using MemoryStream bitmapStream = new MemoryStream();
-
-                bitmap.Save(bitmapStream, ImageFormat.Png);
-
-                bitmapStream.Seek(0, SeekOrigin.Begin);
-
-                // Layer PNG Data Lenght
-                writer.Write((int)bitmapStream.Length);
-                bitmapStream.CopyTo(stream);
-            }
-
-            if (document.Layers.Length == 0)
-            {
-                writer.Write(0);
-            }
+            WriteLayers(document, writer);
         }
 
         /// <summary>
@@ -80,6 +57,34 @@ namespace PixiEditor.Parser
             using FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write);
 
             Serialize(document, stream);
+        }
+
+        private static void WriteLayers(SerializableDocument document, BinaryWriter writer)
+        {
+            foreach (SerializableLayer layer in document)
+            {
+                if (layer.Width * layer.Height == 0)
+                {
+                    writer.Write(0);
+                    continue;
+                }
+
+                using Bitmap bitmap = layer.ToBitmap();
+                using MemoryStream bitmapStream = new MemoryStream();
+
+                bitmap.Save(bitmapStream, ImageFormat.Png);
+
+                bitmapStream.Seek(0, SeekOrigin.Begin);
+
+                // Layer PNG Data Lenght
+                writer.Write((int)bitmapStream.Length);
+                bitmapStream.CopyTo(writer.BaseStream);
+            }
+
+            if (document.Layers.Length == 0)
+            {
+                writer.Write(0);
+            }
         }
     }
 }
