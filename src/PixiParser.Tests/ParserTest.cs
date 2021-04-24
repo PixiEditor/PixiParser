@@ -1,9 +1,8 @@
 using System;
 using System.IO;
-using PixiEditor.Parser;
 using Xunit;
 
-namespace PixiEdtior.Tests
+namespace PixiEditor.Parser.Tests
 {
     public class ParserTest
     {
@@ -25,7 +24,7 @@ namespace PixiEdtior.Tests
                 OffsetX = 0, OffsetY = 0,
                 Opacity = 1 } };
 
-            byte[] serialized = PixiParser.Serialize(document);
+            Span<byte> serialized = PixiParser.Serialize(document);
 
             SerializableDocument deserializedDocument = PixiParser.Deserialize(serialized);
 
@@ -39,7 +38,7 @@ namespace PixiEdtior.Tests
         [Fact]
         public void DetectOldFile()
         {
-            Assert.Throws<OldFileFormatException>(delegate { PixiParser.Deserialize("./OldPixiFile.pixi"); });
+            Assert.Throws<OldFileFormatException>(() => PixiParser.Deserialize("./OldPixiFile.pixi"));
         }
 
         [Fact]

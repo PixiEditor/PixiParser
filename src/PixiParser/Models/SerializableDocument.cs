@@ -2,26 +2,30 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace PixiEditor.Parser
 {
     [Serializable]
-    [MessagePackObject]
+    [DataContract]
     public class SerializableDocument : IEnumerable<SerializableLayer>
     {
-        [Key(0)]
+        [DataMember(Order = 4)]
+        public Version FileVersion { get; set; } = new Version(1, 1);
+
+        [DataMember(Order = 0)]
         public int Width { get; set; }
 
-        [Key(1)]
+        [DataMember(Order = 1)]
         public int Height { get; set; }
 
-        [Key(2)]
-        public byte[] SwatchesData { get; set; }
+        [DataMember(Order = 2)]
+        private byte[] SwatchesData { get; set; }
 
-        [IgnoreMember]
-        public Tuple<byte, byte, byte, byte>[] Swatches { get; set; }
+        [IgnoreDataMember]
+        public Tuple<byte, byte, byte, byte>[] Swatches { get => Helpers.BytesToSwatches(SwatchesData); set => SwatchesData = Helpers.SwatchesToBytes(value); }
 
-        [Key(3)]
+        [DataMember(Order = 3)]
         public SerializableLayer[] Layers { get; set; }
 
         public IEnumerator<SerializableLayer> GetEnumerator()

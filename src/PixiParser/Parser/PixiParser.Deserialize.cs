@@ -1,11 +1,10 @@
-﻿using System;
+﻿using MessagePack;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
-using MessagePack;
 
 namespace PixiEditor.Parser
 {
@@ -19,90 +18,47 @@ namespace PixiEditor.Parser
         /// <returns>The deserialized Document.</returns>
         public static SerializableDocument Deserialize(Span<byte> span)
         {
-            byte[] oldFileFormat = span.Slice(start: 22, 8).ToArray();
-
-            // The old format always begins with the same bytes
-            if (BitConverter.ToUInt64(oldFileFormat.Reverse().ToArray()) == oldFormatIdentifier)
+            if (span.Length > 40)
             {
-                throw new OldFileFormatException("This is a old .pixi file. Use DeserializeOld() to deserialize it");
+                Span<byte> oldFileFormat = span.Slice(22, 8);
+
+                oldFileFormat.Reverse();
+
+                // The old format always begins with the same bytes
+                if (BitConverter.ToUInt64(oldFileFormat) == oldFormatIdentifier)
+                {
+                    throw new OldFileFormatException("This is a old .pixi file. Use DeserializeOld() to deserialize it");
+                }
+
             }
 
-            // The message pack lenght can't be 0
-            if (span[0] == 0)
-            {
-                throw new InvalidFileException("This does not seem to be a .pixi file");
-            }
-
-            int messagePackLenght;
-            byte[] messagePackBytes;
+            int pos = 0;
+            Span<byte> messagePackBytes;
 
             try
             {
-                // First four bytes are message pack lenght
-                byte[] messagePackLenghtBytes = span.Slice(0, 4).ToArray();
-                messagePackLenght = BitConverter.ToInt32(messagePackLenghtBytes, 0);
-
-                // At the fith byte the message pack begins
-                messagePackBytes = span.Slice(4, messagePackLenght).ToArray();
+                messagePackBytes = GetMessagePackBytes(span, ref pos);
             }
             catch (ArgumentOutOfRangeException)
             {
-                throw new InvalidFileException("This does not seem to be a .pixi file");
+                throw new InvalidFileException("Invalid message pack length");
             }
-
-            int pos = messagePackLenght + 4;
-            int i = 0;
 
             SerializableDocument document;
 
             try
             {
-                document = MessagePackSerializer.Deserialize<SerializableDocument>(messagePackBytes);
+                document = MessagePackSerializer.Deserialize<SerializableDocument>(
+                    messagePackBytes.ToArray(), 
+                    MessagePack.Resolvers.StandardResolverAllowPrivate.Options
+                        .WithSecurity(MessagePackSecurity.UntrustedData));
             }
             catch (MessagePackSerializationException)
             {
                 throw new InvalidFileException("Message Pack could not be deserialize");
             }
 
-            document.Swatches = Helpers.BytesToSwatches(document.SwatchesData);
-
-            // Deserialize layer data
-            while (pos < span.Length && document.Layers.Length > i)
-            {
-                SerializableLayer layer = document.Layers[i];
-                layer.MaxWidth = document.Width;
-                layer.MaxHeight = document.Height;
-
-                // Layer data lenght
-                byte[] layerLenghtBytes = span.Slice(pos, 4).ToArray();
-                int layerLenght = BitConverter.ToInt32(layerLenghtBytes, 0);
-
-                if (layerLenght == 0)
-                {
-                    pos += 4;
-                    layer.BitmapBytes = new byte[0];
-                    continue;
-                }
-
-                pos += 4;
-
-                byte[] pngLayerData = span.Slice(pos, layerLenght).ToArray();
-                byte[] rawLayerData;
-
-                using (MemoryStream pngStream = new MemoryStream(pngLayerData))
-                {
-                    using Bitmap png = (Bitmap)Image.FromStream(pngStream);
-
-                    BitmapData data = png.LockBits(new Rectangle(0, 0, png.Width, png.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-                    rawLayerData = new byte[Math.Abs(data.Stride * data.Height)];
-                    Marshal.Copy(data.Scan0, rawLayerData, 0, rawLayerData.Length);
-                }
-
-                layer.BitmapBytes = rawLayerData;
-
-                pos += layerLenght;
-                i++;
-            }
+            ParseLayerPNGs(ref document, span, ref pos);
 
             return document;
         }
@@ -159,6 +115,76 @@ namespace PixiEditor.Parser
             formatter.Binder = new CurrentAssemblyDeserializationBinder();
 
             return (SerializableDocument)formatter.Deserialize(stream);
+        }
+
+        private static Span<byte> GetMessagePackBytes(Span<byte> span, ref int pos)
+        {
+            // First four bytes are message pack length
+            int messagePackLength = BitConverter.ToInt32(span.Slice(0, 4));
+
+            // The message pack length can't be 0
+            if (messagePackLength == 0)
+            {
+                throw new InvalidFileException("This does not seem to be a .pixi file");
+            }
+
+            // At the fith byte the message pack begins
+            Span<byte> messagePackBytes = span.Slice(4, messagePackLength);
+
+            pos += messagePackLength + 4;
+
+            return messagePackBytes;
+        }
+
+        private static void ParseLayerPNGs(ref SerializableDocument document, Span<byte> span, ref int pos)
+        {
+            int i = 0;
+
+            // Deserialize layer data
+            while (pos < span.Length && document.Layers.Length > i)
+            {
+                SerializableLayer layer = document.Layers[i];
+                layer.MaxWidth = document.Width;
+                layer.MaxHeight = document.Height;
+
+                // Layer data length
+                int layerLength = BitConverter.ToInt32(span.Slice(pos, 4));
+
+                if (layerLength == 0)
+                {
+                    pos += 4;
+                    layer.BitmapBytes = new byte[0];
+                    continue;
+                }
+
+                pos += 4;
+
+                try
+                {
+                    layer.BitmapBytes = ParsePNGToRawBytes(span.Slice(pos, layerLength));
+                }
+                catch (InvalidFileException)
+                {
+                    throw new InvalidFileException($"Parsing layer (Index: {i}) failed");
+                }
+
+                pos += layerLength;
+                i++;
+            }
+        }
+
+        private static byte[] ParsePNGToRawBytes(Span<byte> bytes)
+        {
+            byte[] rawLayerData;
+
+            using MemoryStream pngStream = new MemoryStream(bytes.ToArray());
+            using Bitmap png = (Bitmap)Image.FromStream(pngStream);
+
+            BitmapData data = png.LockBits(new Rectangle(0, 0, png.Width, png.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            rawLayerData = new byte[Math.Abs(data.Stride * data.Height)];
+            Marshal.Copy(data.Scan0, rawLayerData, 0, rawLayerData.Length);
+
+            return rawLayerData;
         }
     }
 }
