@@ -12,9 +12,10 @@ namespace PixiEditor.Parser.Tests
             SerializableDocument document = new SerializableDocument
             {
                 Height = 1,
-                Width = 1,
-                Swatches = new Tuple<byte, byte, byte, byte>[] { new Tuple<byte, byte, byte, byte>(255, 255, 255, 255) }
+                Width = 1
             };
+
+            document.AddSwatch(255, 255, 255);
 
             byte[] imageData = new byte[] { 255, 255, 255, 255 };
 
@@ -30,9 +31,10 @@ namespace PixiEditor.Parser.Tests
 
             SerializableDocument deserializedDocument = PixiParser.Deserialize(serialized);
 
+            Assert.Equal(document.FileVersion, deserializedDocument.FileVersion);
             Assert.Equal(document.Height, deserializedDocument.Height);
             Assert.Equal(document.Width, deserializedDocument.Width);
-            Assert.Equal(document.Swatches.Length, deserializedDocument.Swatches.Length);
+            Assert.Equal(document.Swatches.Count, deserializedDocument.Swatches.Count);
 
             Assert.Equal(document.Layers[0].BitmapBytes, deserializedDocument.Layers[0].BitmapBytes);
         }

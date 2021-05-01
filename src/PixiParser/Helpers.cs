@@ -5,14 +5,14 @@ namespace PixiEditor.Parser
 {
     internal static class Helpers
     {
-        public static Tuple<byte, byte, byte, byte>[] BytesToSwatches(byte[] bytes)
+        public static List<(byte, byte, byte, byte)> BytesToSwatches(byte[] bytes)
         {
+            List<(byte, byte, byte, byte)> swatches = new List<(byte, byte, byte, byte)>();
+
             if (bytes is null)
             {
-                return Array.Empty<Tuple<byte, byte, byte, byte>>();
+                return swatches;
             }
-
-            List<Tuple<byte, byte, byte, byte>> swatches = new List<Tuple<byte, byte, byte, byte>>();
 
             // Convert the swatch byte array to a tuple array
             for (int sI = 0; sI < bytes.Length; sI += 4)
@@ -22,13 +22,13 @@ namespace PixiEditor.Parser
                 byte g = bytes[sI + 2];
                 byte b = bytes[sI + 3];
 
-                swatches.Add(new Tuple<byte, byte, byte, byte>(a, r, g, b));
+                swatches.Add((a, r, g, b));
             }
 
-            return swatches.ToArray();
+            return swatches;
         }
 
-        public static byte[] SwatchesToBytes(IEnumerable<Tuple<byte, byte, byte, byte>> swatches)
+        public static byte[] SwatchesToBytes(IEnumerable<(byte, byte, byte, byte)> swatches)
         {
             if (swatches is null)
             {
