@@ -15,50 +15,20 @@ namespace PixiEditor.Parser
         /// <summary>
         /// Deserializes to a <see cref="SerializableDocument"/>.
         /// </summary>
+        /// <param name="path">The stream to deserialize from</param>
+        /// <param name="streamPosition">From where to start reading the stream, use null to start from current position.</param>
         /// <returns>The deserialized Document.</returns>
-        public static SerializableDocument Deserialize(Span<byte> span)
+        public static SerializableDocument Deserialize(Stream stream)
         {
-            if (span.Length > 40)
-            {
-                Span<byte> oldFileFormat = span.Slice(22, 8);
+            BinaryReader reader = new BinaryReader(stream);
 
-                oldFileFormat.Reverse();
+            ThrowIfOldFormat(reader);
 
-                // The old format always begins with the same bytes
-                if (BitConverter.ToUInt64(oldFileFormat) == oldFormatIdentifier)
-                {
-                    throw new OldFileFormatException("This is a old .pixi file. Use DeserializeOld() to deserialize it");
-                }
+            byte[] msgPack = GetMessagePack(reader);
 
-            }
+            SerializableDocument document = ParseDocument(msgPack);
 
-            int pos = 0;
-            Span<byte> messagePackBytes;
-
-            try
-            {
-                messagePackBytes = GetMessagePackBytes(span, ref pos);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                throw new InvalidFileException("Invalid message pack length");
-            }
-
-            SerializableDocument document;
-
-            try
-            {
-                document = MessagePackSerializer.Deserialize<SerializableDocument>(
-                    messagePackBytes.ToArray(), 
-                    MessagePack.Resolvers.StandardResolverAllowPrivate.Options
-                        .WithSecurity(MessagePackSecurity.UntrustedData));
-            }
-            catch (MessagePackSerializationException)
-            {
-                throw new InvalidFileException("Message Pack could not be deserialize");
-            }
-
-            ParseLayerPNGs(ref document, span, ref pos);
+            ParseLayers(ref document, reader);
 
             return document;
         }
@@ -67,28 +37,7 @@ namespace PixiEditor.Parser
         /// Deserializes to a <see cref="SerializableDocument"/>.
         /// </summary>
         /// <returns>The deserialized Document.</returns>
-        public static SerializableDocument Deserialize(byte[] bytes)
-        {
-            return Deserialize(new Span<byte>(bytes));
-        }
-
-        /// <summary>
-        /// Deserializes to a <see cref="SerializableDocument"/>.
-        /// </summary>
-        /// <param name="path">The stream to deserialize from</param>
-        /// <param name="streamPosition">From where to start reading the stream, use null to start from current position.</param>
-        /// <returns>The deserialized Document.</returns>
-        public static SerializableDocument Deserialize(Stream stream, int? streamPosition = 0)
-        {
-            Span<byte> span = new Span<byte>(new byte[stream.Length]);
-            if (streamPosition.HasValue)
-            {
-                stream.Position = streamPosition.Value;
-            }
-            stream.Read(span);
-
-            return Deserialize(span);
-        }
+        public static SerializableDocument Deserialize(byte[] bytes) => Deserialize(new MemoryStream(bytes));
 
         /// <summary>
         /// Deserializes to a <see cref="SerializableDocument"/>.
@@ -102,82 +51,68 @@ namespace PixiEditor.Parser
             return Deserialize(stream);
         }
 
-        /// <summary>
-        /// Deserializes the old pixi format. Note: Only use this if you know that its a old PixiFile.
-        /// </summary>
-        /// <param name="stream">The stream to deserialize.</param>
-        /// <returns>The deserialized Document.</returns>
-        public static SerializableDocument DeserializeOld(Stream stream)
+        private static void ThrowIfOldFormat(BinaryReader reader)
         {
-            BinaryFormatter formatter = new BinaryFormatter();
-
-            formatter.AssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple;
-            formatter.Binder = new CurrentAssemblyDeserializationBinder();
-
-            return (SerializableDocument)formatter.Deserialize(stream);
-        }
-
-        private static Span<byte> GetMessagePackBytes(Span<byte> span, ref int pos)
-        {
-            // First four bytes are message pack length
-            int messagePackLength = BitConverter.ToInt32(span.Slice(0, 4));
-
-            // The message pack length can't be 0
-            if (messagePackLength == 0)
+            if (reader.BaseStream.CanSeek && reader.BaseStream.Length > 44)
             {
-                throw new InvalidFileException("This does not seem to be a .pixi file");
-            }
+                reader.BaseStream.Position += 22;
 
-            // At the fith byte the message pack begins
-            Span<byte> messagePackBytes = span.Slice(4, messagePackLength);
+                var oldFile = reader.ReadUInt64();
 
-            pos += messagePackLength + 4;
+                reader.BaseStream.Position -= 22 + 8;
 
-            return messagePackBytes;
-        }
-
-        private static void ParseLayerPNGs(ref SerializableDocument document, Span<byte> span, ref int pos)
-        {
-            int i = 0;
-
-            // Deserialize layer data
-            while (pos < span.Length && document.Layers.Length > i)
-            {
-                SerializableLayer layer = document.Layers[i];
-                layer.MaxWidth = document.Width;
-                layer.MaxHeight = document.Height;
-
-                // Layer data length
-                int layerLength = BitConverter.ToInt32(span.Slice(pos, 4));
-
-                if (layerLength == 0)
+                if (oldFile == oldFormatIdentifier)
                 {
-                    pos += 4;
-                    layer.BitmapBytes = new byte[0];
-                    continue;
+                    throw new OldFileFormatException();
                 }
+            }
+        }
 
-                pos += 4;
+        private static byte[] GetMessagePack(BinaryReader reader)
+        {
+            int messagePackLenght = reader.ReadInt32();
+            return reader.ReadBytes(messagePackLenght);
+        }
+
+        private static SerializableDocument ParseDocument(byte[] messagePack)
+        {
+            try
+            {
+                return MessagePackSerializer.Deserialize<SerializableDocument>(
+                    messagePack,
+                    MessagePack.Resolvers.StandardResolverAllowPrivate.Options
+                        .WithSecurity(MessagePackSecurity.UntrustedData));
+            }
+            catch (MessagePackSerializationException)
+            {
+                throw new InvalidFileException("Message Pack could not be deserialize");
+            }
+        }
+
+        private static void ParseLayers(ref SerializableDocument document, BinaryReader reader)
+        {
+            foreach (SerializableLayer layer in document)
+            {
+                int layerLenght = reader.ReadInt32();
+
+                byte[] layerBytes = reader.ReadBytes(layerLenght);
 
                 try
                 {
-                    layer.BitmapBytes = ParsePNGToRawBytes(span.Slice(pos, layerLength));
+                    layer.BitmapBytes = ParsePNGToRawBytes(layerBytes);
                 }
                 catch (InvalidFileException)
                 {
-                    throw new InvalidFileException($"Parsing layer (Index: {i}) failed");
+                    throw new InvalidFileException($"Parsing layer ('{layer.Name}') failed");
                 }
-
-                pos += layerLength;
-                i++;
             }
         }
 
-        private static byte[] ParsePNGToRawBytes(Span<byte> bytes)
+        private static byte[] ParsePNGToRawBytes(byte[] bytes)
         {
             byte[] rawLayerData;
 
-            using MemoryStream pngStream = new MemoryStream(bytes.ToArray());
+            using MemoryStream pngStream = new MemoryStream(bytes);
             using Bitmap png = (Bitmap)Image.FromStream(pngStream);
 
             BitmapData data = png.LockBits(new Rectangle(0, 0, png.Width, png.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);

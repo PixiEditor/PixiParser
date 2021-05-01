@@ -9,10 +9,12 @@ namespace PixiEditor.Parser.Tests
         [Fact]
         public void SerializingAndDeserialzingWorks()
         {
-            SerializableDocument document = new SerializableDocument();
-            document.Height = 1;
-            document.Width = 1;
-            document.Swatches = new Tuple<byte, byte, byte, byte>[] { new Tuple<byte, byte, byte, byte>(255, 255, 255, 255) };
+            SerializableDocument document = new SerializableDocument
+            {
+                Height = 1,
+                Width = 1,
+                Swatches = new Tuple<byte, byte, byte, byte>[] { new Tuple<byte, byte, byte, byte>(255, 255, 255, 255) }
+            };
 
             byte[] imageData = new byte[] { 255, 255, 255, 255 };
 
@@ -24,7 +26,7 @@ namespace PixiEditor.Parser.Tests
                 OffsetX = 0, OffsetY = 0,
                 Opacity = 1 } };
 
-            Span<byte> serialized = PixiParser.Serialize(document);
+            byte[] serialized = PixiParser.Serialize(document);
 
             SerializableDocument deserializedDocument = PixiParser.Deserialize(serialized);
 
@@ -39,14 +41,6 @@ namespace PixiEditor.Parser.Tests
         public void DetectOldFile()
         {
             Assert.Throws<OldFileFormatException>(() => PixiParser.Deserialize("./OldPixiFile.pixi"));
-        }
-
-        [Fact]
-        public void ParsesOldFile()
-        {
-            using FileStream stream = new FileStream("./OldPixiFile.pixi", FileMode.Open, FileAccess.Read);
-
-            PixiParser.DeserializeOld(stream);
         }
 
         [Fact]
