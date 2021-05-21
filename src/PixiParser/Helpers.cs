@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace PixiEditor.Parser
 {
     internal static class Helpers
     {
-        public static List<(byte, byte, byte, byte)> BytesToSwatches(byte[] bytes)
+        public static List<Color> BytesToSwatches(byte[] bytes)
         {
-            List<(byte, byte, byte, byte)> swatches = new List<(byte, byte, byte, byte)>();
+            List<Color> swatches = new List<Color>();
 
             if (bytes is null)
             {
@@ -22,13 +23,13 @@ namespace PixiEditor.Parser
                 byte g = bytes[sI + 2];
                 byte b = bytes[sI + 3];
 
-                swatches.Add((a, r, g, b));
+                swatches.Add(Color.FromArgb(a, r, g, b));
             }
 
             return swatches;
         }
 
-        public static byte[] SwatchesToBytes(IEnumerable<(byte, byte, byte, byte)> swatches)
+        public static byte[] SwatchesToBytes(IEnumerable<Color> swatches)
         {
             if (swatches is null)
             {
@@ -37,12 +38,12 @@ namespace PixiEditor.Parser
 
             List<byte> tupleData = new List<byte>();
 
-            foreach (var tuple in swatches)
+            foreach (var color in swatches)
             {
-                tupleData.Add(tuple.Item1);
-                tupleData.Add(tuple.Item2);
-                tupleData.Add(tuple.Item3);
-                tupleData.Add(tuple.Item4);
+                tupleData.Add(color.A);
+                tupleData.Add(color.R);
+                tupleData.Add(color.G);
+                tupleData.Add(color.B);
             }
 
             return tupleData.ToArray();

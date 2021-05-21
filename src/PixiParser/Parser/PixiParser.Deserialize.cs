@@ -5,13 +5,12 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace PixiEditor.Parser
 {
     public static partial class PixiParser
     {
-        static readonly byte[] oldFormatIdentifier = 
+        static readonly byte[] oldFormatIdentifier =
             new byte[] { 0x41, 0x50, 0x69, 0x78, 0x69, 0x45, 0x64, 0x69 };
 
         /// <summary>

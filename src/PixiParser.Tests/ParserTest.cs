@@ -1,5 +1,4 @@
-using System;
-using System.IO;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PixiEditor.Parser.Tests
@@ -19,13 +18,16 @@ namespace PixiEditor.Parser.Tests
 
             byte[] imageData = new byte[] { 255, 255, 255, 255 };
 
-            document.Layers = new SerializableLayer[] { new SerializableLayer() {
-                Width = 1, Height = 1,
-                MaxHeight = 1, MaxWidth = 1,
-                BitmapBytes = imageData,
-                IsVisible = true, Name = "Base Layer",
-                OffsetX = 0, OffsetY = 0,
-                Opacity = 1 } };
+            document.Layers = new List<SerializableLayer>
+            {
+                new SerializableLayer(1, 1)
+                    {
+                        MaxHeight = 1, MaxWidth = 1,
+                        BitmapBytes = imageData,
+                        IsVisible = true, Name = "Base Layer",
+                        Opacity = 1
+                }
+            };
 
             byte[] serialized = PixiParser.Serialize(document);
 
@@ -43,7 +45,7 @@ namespace PixiEditor.Parser.Tests
                 Height = 1
             };
 
-            document.Layers = new SerializableLayer[]
+            document.Layers = new List<SerializableLayer>()
             {
                 new SerializableLayer()
                 {
@@ -71,7 +73,13 @@ namespace PixiEditor.Parser.Tests
         [Fact]
         public void DetectCorruptedFile()
         {
-            Assert.Throws<InvalidFileException>(delegate { PixiParser.Deserialize("./CorruptedPixiFile.pixi"); });
+            Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./CorruptedPixiFile.pixi"));
+        }
+
+        [Fact]
+        public void CanOpenExistingPixiFile()
+        {
+            PixiParser.Deserialize("./Room.pixi");
         }
 
         private void AssertEqual(SerializableDocument document, SerializableDocument otherDocument)

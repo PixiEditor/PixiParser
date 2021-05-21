@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace PixiEditor.Parser.Benchmarks
 {
@@ -10,8 +12,8 @@ namespace PixiEditor.Parser.Benchmarks
             {
                 Width = Size,
                 Height = Size,
-                Swatches = new Tuple<byte, byte, byte, byte>[] { new Tuple<byte, byte, byte, byte>(0, 0, 0, 0) },
-                Layers = new SerializableLayer[Layers]
+                Swatches = new List<Color> { Color.FromArgb(255, 255, 255, 255) },
+                Layers = new List<SerializableLayer>()
             };
 
             for (int i = 0; i < Layers; i++)

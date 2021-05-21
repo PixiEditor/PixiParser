@@ -1,5 +1,4 @@
 ﻿using MessagePack;
-using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -77,7 +76,7 @@ namespace PixiEditor.Parser
                 bitmapStream.CopyTo(writer.BaseStream);
             }
 
-            if (document.Layers.Length == 0)
+            if (document.Layers.Count == 0)
             {
                 writer.Write(0);
             }
