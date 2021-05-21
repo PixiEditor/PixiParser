@@ -24,10 +24,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <None Include="..\..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
     <None Include="..\..\PixiParserLogo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
