@@ -95,6 +95,11 @@ namespace PixiEditor.Parser
             {
                 int layerLenght = reader.ReadInt32();
 
+                if (layerLenght == 0)
+                {
+                    continue;
+                }
+
                 byte[] layerBytes = reader.ReadBytes(layerLenght);
 
                 try
