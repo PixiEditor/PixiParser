@@ -3,6 +3,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -10,7 +11,8 @@ namespace PixiEditor.Parser
 {
     public static partial class PixiParser
     {
-        const ulong oldFormatIdentifier = 0x41_50_69_78_69_45_64_69;
+        static readonly byte[] oldFormatIdentifier = 
+            new byte[] { 0x41, 0x50, 0x69, 0x78, 0x69, 0x45, 0x64, 0x69 };
 
         /// <summary>
         /// Deserializes to a <see cref="SerializableDocument"/>.
@@ -57,11 +59,11 @@ namespace PixiEditor.Parser
             {
                 reader.BaseStream.Position += 22;
 
-                var oldFile = reader.ReadUInt64();
+                var oldFile = reader.ReadBytes(8);
 
                 reader.BaseStream.Position -= 22 + 8;
 
-                if (oldFile == oldFormatIdentifier)
+                if (oldFile.SequenceEqual(oldFormatIdentifier))
                 {
                     throw new OldFileFormatException();
                 }
