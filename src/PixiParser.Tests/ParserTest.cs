@@ -1,5 +1,4 @@
-using System;
-using System.IO;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PixiEditor.Parser.Tests
@@ -9,30 +8,60 @@ namespace PixiEditor.Parser.Tests
         [Fact]
         public void SerializingAndDeserialzingWorks()
         {
-            SerializableDocument document = new SerializableDocument();
-            document.Height = 1;
-            document.Width = 1;
-            document.Swatches = new Tuple<byte, byte, byte, byte>[] { new Tuple<byte, byte, byte, byte>(255, 255, 255, 255) };
+            SerializableDocument document = new SerializableDocument
+            {
+                Height = 1,
+                Width = 1
+            };
+
+            document.AddSwatch(255, 255, 255);
 
             byte[] imageData = new byte[] { 255, 255, 255, 255 };
 
-            document.Layers = new SerializableLayer[] { new SerializableLayer() {
-                Width = 1, Height = 1,
-                MaxHeight = 1, MaxWidth = 1,
-                BitmapBytes = imageData,
-                IsVisible = true, Name = "Base Layer",
-                OffsetX = 0, OffsetY = 0,
-                Opacity = 1 } };
+            document.Layers = new List<SerializableLayer>
+            {
+                new SerializableLayer(1, 1)
+                    {
+                        MaxHeight = 1, MaxWidth = 1,
+                        BitmapBytes = imageData,
+                        IsVisible = true, Name = "Base Layer",
+                        Opacity = 1
+                }
+            };
 
-            Span<byte> serialized = PixiParser.Serialize(document);
+            byte[] serialized = PixiParser.Serialize(document);
 
             SerializableDocument deserializedDocument = PixiParser.Deserialize(serialized);
 
-            Assert.Equal(document.Height, deserializedDocument.Height);
-            Assert.Equal(document.Width, deserializedDocument.Width);
-            Assert.Equal(document.Swatches.Length, deserializedDocument.Swatches.Length);
+            AssertEqual(document, deserializedDocument);
+        }
 
-            Assert.Equal(document.Layers[0].BitmapBytes, deserializedDocument.Layers[0].BitmapBytes);
+        [Fact]
+        public void SerializeAndDeserializeEmptyLayer()
+        {
+            SerializableDocument document = new SerializableDocument
+            {
+                Width = 1,
+                Height = 1
+            };
+
+            document.Layers = new List<SerializableLayer>()
+            {
+                new SerializableLayer()
+                {
+                    Width = 0, Height = 0,
+                    MaxHeight = 1, MaxWidth = 1,
+                    IsVisible = true,
+                    Name = "Base Layer", Opacity = 1,
+                    OffsetX = 0, OffsetY = 0,
+                }
+            };
+
+            var serialized = PixiParser.Serialize(document);
+
+            SerializableDocument deserialized = PixiParser.Deserialize(serialized);
+
+            AssertEqual(document, deserialized);
         }
 
         [Fact]
@@ -42,17 +71,25 @@ namespace PixiEditor.Parser.Tests
         }
 
         [Fact]
-        public void ParsesOldFile()
+        public void DetectCorruptedFile()
         {
-            using FileStream stream = new FileStream("./OldPixiFile.pixi", FileMode.Open, FileAccess.Read);
-
-            PixiParser.DeserializeOld(stream);
+            Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./CorruptedPixiFile.pixi"));
         }
 
         [Fact]
-        public void DetectCorruptedFile()
+        public void CanOpenExistingPixiFile()
         {
-            Assert.Throws<InvalidFileException>(delegate { PixiParser.Deserialize("./CorruptedPixiFile.pixi"); });
+            PixiParser.Deserialize("./Room.pixi");
+        }
+
+        private void AssertEqual(SerializableDocument document, SerializableDocument otherDocument)
+        {
+            Assert.Equal(document.FileVersion, otherDocument.FileVersion);
+            Assert.Equal(document.Height, otherDocument.Height);
+            Assert.Equal(document.Width, otherDocument.Width);
+            Assert.Equal(document.Swatches.Count, otherDocument.Swatches.Count);
+
+            Assert.Equal(document.Layers[0].BitmapBytes, otherDocument.Layers[0].BitmapBytes);
         }
     }
 }

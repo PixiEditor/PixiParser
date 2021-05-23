@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -41,6 +40,26 @@ namespace PixiEditor.Parser
 
         [DataMember(Order = 6)]
         public float Opacity { get; set; }
+
+        public SerializableLayer()
+        {
+            IsVisible = true;
+            Opacity = 1;
+        }
+
+        public SerializableLayer(int width, int height)
+            : this()
+        {
+            Width = width;
+            Height = height;
+        }
+
+        public SerializableLayer(int width, int height, int offsetX, int offsetY)
+            : this(width, height)
+        {
+            OffsetX = offsetX;
+            OffsetY = offsetY;
+        }
 
         public Bitmap ToBitmap()
         {

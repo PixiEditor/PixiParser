@@ -1,7 +1,7 @@
-﻿using MessagePack;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Runtime.Serialization;
 
 namespace PixiEditor.Parser
@@ -11,7 +11,7 @@ namespace PixiEditor.Parser
     public class SerializableDocument : IEnumerable<SerializableLayer>
     {
         [DataMember(Order = 4)]
-        public Version FileVersion { get; set; } = new Version(1, 1);
+        public Version FileVersion { get; private set; } = new Version(1, 1);
 
         [DataMember(Order = 0)]
         public int Width { get; set; }
@@ -20,25 +20,35 @@ namespace PixiEditor.Parser
         public int Height { get; set; }
 
         [DataMember(Order = 2)]
-        private byte[] SwatchesData { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used by Message Pack")]
+        private byte[] SwatchesData { get => Helpers.SwatchesToBytes(Swatches); set => Swatches = Helpers.BytesToSwatches(value); }
 
         [IgnoreDataMember]
-        public Tuple<byte, byte, byte, byte>[] Swatches { get => Helpers.BytesToSwatches(SwatchesData); set => SwatchesData = Helpers.SwatchesToBytes(value); }
+        public List<Color> Swatches { get; set; } = new List<Color>();
 
         [DataMember(Order = 3)]
-        public SerializableLayer[] Layers { get; set; }
+        public List<SerializableLayer> Layers { get; set; } = new List<SerializableLayer>();
 
-        public IEnumerator<SerializableLayer> GetEnumerator()
+        public SerializableDocument() { }
+
+        public SerializableDocument(int width, int height)
         {
-            foreach (SerializableLayer layer in Layers)
-            {
-                yield return layer;
-            }
+            Width = width;
+            Height = height;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public SerializableDocument(int width, int height, params SerializableLayer[] layers)
+            : this(width, height)
         {
-            return Layers.GetEnumerator();
+            Layers = new List<SerializableLayer>(layers);
         }
+
+        public void AddSwatch(byte a, byte r, byte g, byte b) => Swatches.Add(Color.FromArgb(a, r, g, b));
+
+        public void AddSwatch(byte r, byte g, byte b) => AddSwatch(255, r, g, b);
+
+        public IEnumerator<SerializableLayer> GetEnumerator() => Layers.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => Layers.GetEnumerator();
     }
 }

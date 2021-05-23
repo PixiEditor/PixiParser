@@ -1,5 +1,4 @@
 ﻿using MessagePack;
-using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -29,7 +28,7 @@ namespace PixiEditor.Parser
         /// </summary>
         /// <param name="document">The document to serialize.</param>
         /// <returns>The serialized bytes.</returns>
-        public static Span<byte> Serialize(SerializableDocument document)
+        public static byte[] Serialize(SerializableDocument document)
         {
             MemoryStream stream = new MemoryStream();
 
@@ -37,11 +36,11 @@ namespace PixiEditor.Parser
 
             stream.Seek(0, SeekOrigin.Begin);
 
-            Span<byte> span = new Span<byte>(new byte[stream.Length]);
+            byte[] buffer = new byte[stream.Length];
 
-            stream.Read(span);
+            stream.Read(buffer, 0, buffer.Length);
 
-            return span;
+            return buffer;
         }
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace PixiEditor.Parser
                 bitmapStream.CopyTo(writer.BaseStream);
             }
 
-            if (document.Layers.Length == 0)
+            if (document.Layers.Count == 0)
             {
                 writer.Write(0);
             }
