@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PixiEditor.Parser.Models;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -29,6 +30,9 @@ namespace PixiEditor.Parser
         [DataMember(Order = 3)]
         public List<SerializableLayer> Layers { get; set; } = new List<SerializableLayer>();
 
+        [DataMember(Order = 5)]
+        public SerializableGuidStructureItem[] Groups { get; set; }
+
         public SerializableDocument() { }
 
         public SerializableDocument(int width, int height)
@@ -37,10 +41,11 @@ namespace PixiEditor.Parser
             Height = height;
         }
 
-        public SerializableDocument(int width, int height, params SerializableLayer[] layers)
+        public SerializableDocument(int width, int height, SerializableGuidStructureItem[] groups, params SerializableLayer[] layers)
             : this(width, height)
         {
             Layers = new List<SerializableLayer>(layers);
+            Groups = groups;
         }
 
         public void AddSwatch(byte a, byte r, byte g, byte b) => Swatches.Add(Color.FromArgb(a, r, g, b));
