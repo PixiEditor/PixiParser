@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -28,6 +29,17 @@ namespace PixiEditor.Parser.Tests
                         Opacity = 1
                 }
             };
+
+            var topGuid = Guid.NewGuid();
+            var bottomGuid = Guid.NewGuid();
+
+            document.Groups = new Models.SerializableGuidStructureItem[]
+            {
+                new Models.SerializableGuidStructureItem(Guid.NewGuid(), "Test name", bottomGuid, topGuid,
+                new Models.SerializableGuidStructureItem[] { new Models.SerializableGuidStructureItem(Guid.NewGuid(), "Test name 1", bottomGuid, topGuid, null, null, false, 0.7f)}, null, true, 1f)
+            };
+
+            document.Groups[0].Subgroups[0].Parent = document.Groups[0];
 
             byte[] serialized = PixiParser.Serialize(document);
 
