@@ -7,7 +7,6 @@ using System.Runtime.Serialization;
 
 namespace PixiEditor.Parser
 {
-    [Serializable]
     [DataContract]
     public class SerializableLayer
     {

@@ -6,7 +6,6 @@ using System.Text;
 
 namespace PixiEditor.Parser.Models
 {
-    [Serializable]
     [DataContract]
     public class SerializableGuidStructureItem
     {
