@@ -7,7 +7,6 @@ using System.Runtime.Serialization;
 
 namespace PixiEditor.Parser
 {
-    [Serializable]
     [DataContract]
     public class SerializableLayer
     {
@@ -40,6 +39,9 @@ namespace PixiEditor.Parser
 
         [DataMember(Order = 6)]
         public float Opacity { get; set; }
+
+        [DataMember(Order = 7)]
+        public Guid LayerGuid { get; set; }
 
         public SerializableLayer()
         {
@@ -82,7 +84,7 @@ namespace PixiEditor.Parser
 
         public override int GetHashCode()
         {
-            HashCode hashCode = default(HashCode);
+            HashCode hashCode = default;
             hashCode.Add(Name);
             hashCode.Add(Width);
             hashCode.Add(Height);
