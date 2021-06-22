@@ -22,15 +22,12 @@ namespace PixiEditor.Parser.Models
         public Guid EndLayerGuid { get; set; }
 
         [DataMember(Order = 5)]
-        public SerializableGuidStructureItem Parent { get; set; }
-
-        [DataMember(Order = 6)]
         public SerializableGuidStructureItem[] Subgroups { get; set; }
 
-        [DataMember(Order = 7)]
+        [DataMember(Order = 6)]
         public bool IsVisible { get; set; }
 
-        [DataMember(Order = 8)]
+        [DataMember(Order = 7)]
         public float Opacity { get; set; }
 
         public SerializableGuidStructureItem()
@@ -39,14 +36,13 @@ namespace PixiEditor.Parser.Models
             Opacity = 1;
         }
 
-        public SerializableGuidStructureItem(Guid groupGuid, string name, Guid startLayerGuid, Guid endLayerGuid, SerializableGuidStructureItem[] subgroups, SerializableGuidStructureItem parent, bool isVisible, float opacity)
+        public SerializableGuidStructureItem(Guid groupGuid, string name, Guid startLayerGuid, Guid endLayerGuid, SerializableGuidStructureItem[] subgroups, bool isVisible, float opacity)
         {
             GroupGuid = groupGuid;
             Name = name;
             StartLayerGuid = startLayerGuid;
             EndLayerGuid = endLayerGuid;
             Subgroups = subgroups;
-            Parent = parent;
             IsVisible = isVisible;
             Opacity = opacity;
         }
