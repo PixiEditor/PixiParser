@@ -21,13 +21,13 @@ namespace PixiEditor.Parser.Models
         [DataMember(Order = 4)]
         public Guid EndLayerGuid { get; set; }
 
-        [DataMember(Order = 6)]
+        [DataMember(Order = 5)]
         public SerializableGuidStructureItem[] Subgroups { get; set; }
 
-        [DataMember(Order = 7)]
+        [DataMember(Order = 6)]
         public bool IsVisible { get; set; }
 
-        [DataMember(Order = 8)]
+        [DataMember(Order = 7)]
         public float Opacity { get; set; }
 
         public SerializableGuidStructureItem()
