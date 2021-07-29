@@ -100,16 +100,16 @@ namespace PixiEditor.Parser
             {
                 byte[] layerLength = new byte[4];
                 stream.Read(layerLength);
-                int layerLenghtI = BitConverter.ToInt32(layerLength);
+                int layerLengthI = BitConverter.ToInt32(layerLength);
 
-                if (layerLenghtI == 0)
+                if (layerLengthI == 0)
                 {
                     continue;
                 }
 
                 try
                 {
-                    layer.PngBytes = new byte[layerLenghtI];
+                    layer.PngBytes = new byte[layerLengthI];
                     stream.Read(layer.PngBytes);
                 }
                 catch (InvalidFileException)
