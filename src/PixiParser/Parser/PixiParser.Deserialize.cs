@@ -72,9 +72,9 @@ namespace PixiEditor.Parser
 
         private static byte[] GetMessagePack(Stream stream)
         {
-            byte[] lenght = new byte[4];
-            stream.Read(lenght);
-            byte[] buffer = new byte[BitConverter.ToInt32(lenght)];
+            byte[] length = new byte[4];
+            stream.Read(length);
+            byte[] buffer = new byte[BitConverter.ToInt32(length)];
             stream.Read(buffer, 0, buffer.Length);
             return buffer;
         }
@@ -98,9 +98,9 @@ namespace PixiEditor.Parser
         {
             foreach (SerializableLayer layer in document)
             {
-                byte[] layerLenght = new byte[4];
-                stream.Read(layerLenght);
-                int layerLenghtI = BitConverter.ToInt32(layerLenght);
+                byte[] layerLength = new byte[4];
+                stream.Read(layerLength);
+                int layerLenghtI = BitConverter.ToInt32(layerLength);
 
                 if (layerLenghtI == 0)
                 {
