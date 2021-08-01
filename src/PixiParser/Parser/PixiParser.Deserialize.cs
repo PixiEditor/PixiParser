@@ -1,10 +1,7 @@
 ﻿using MessagePack;
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace PixiEditor.Parser
 {
@@ -21,15 +18,16 @@ namespace PixiEditor.Parser
         /// <returns>The deserialized Document.</returns>
         public static SerializableDocument Deserialize(Stream stream)
         {
-            BinaryReader reader = new BinaryReader(stream);
+            ThrowIfOldFormat(stream);
 
-            ThrowIfOldFormat(reader);
-
-            byte[] msgPack = GetMessagePack(reader);
+            byte[] msgPack = GetMessagePack(stream);
 
             SerializableDocument document = ParseDocument(msgPack);
 
-            ParseLayers(ref document, reader);
+            if (document.FileVersion < new Version(2, 0))
+            {
+                ParseLayers(ref document, stream);
+            }
 
             return document;
         }
@@ -52,27 +50,33 @@ namespace PixiEditor.Parser
             return Deserialize(stream);
         }
 
-        private static void ThrowIfOldFormat(BinaryReader reader)
+        private static void ThrowIfOldFormat(Stream stream)
         {
-            if (reader.BaseStream.CanSeek && reader.BaseStream.Length > 44)
+            if (!stream.CanSeek || stream.Length <= 44)
             {
-                reader.BaseStream.Position += 22;
+                return;
+            }
 
-                var oldFile = reader.ReadBytes(8);
+            stream.Position += 22;
 
-                reader.BaseStream.Position -= 22 + 8;
+            byte[] buffer = new byte[8];
+            stream.Read(buffer);
 
-                if (oldFile.SequenceEqual(oldFormatIdentifier))
-                {
-                    throw new OldFileFormatException();
-                }
+            stream.Position -= 22 + 8;
+
+            if (buffer.SequenceEqual(oldFormatIdentifier))
+            {
+                throw new OldFileFormatException();
             }
         }
 
-        private static byte[] GetMessagePack(BinaryReader reader)
+        private static byte[] GetMessagePack(Stream stream)
         {
-            int messagePackLenght = reader.ReadInt32();
-            return reader.ReadBytes(messagePackLenght);
+            byte[] length = new byte[4];
+            stream.Read(length);
+            byte[] buffer = new byte[BitConverter.ToInt32(length)];
+            stream.Read(buffer, 0, buffer.Length);
+            return buffer;
         }
 
         private static SerializableDocument ParseDocument(byte[] messagePack)
@@ -90,42 +94,29 @@ namespace PixiEditor.Parser
             }
         }
 
-        private static void ParseLayers(ref SerializableDocument document, BinaryReader reader)
+        private static void ParseLayers(ref SerializableDocument document, Stream stream)
         {
             foreach (SerializableLayer layer in document)
             {
-                int layerLenght = reader.ReadInt32();
+                byte[] layerLength = new byte[4];
+                stream.Read(layerLength);
+                int layerLengthI = BitConverter.ToInt32(layerLength);
 
-                if (layerLenght == 0)
+                if (layerLengthI == 0)
                 {
                     continue;
                 }
 
-                byte[] layerBytes = reader.ReadBytes(layerLenght);
-
                 try
                 {
-                    layer.BitmapBytes = ParsePNGToRawBytes(layerBytes);
+                    layer.PngBytes = new byte[layerLengthI];
+                    stream.Read(layer.PngBytes);
                 }
                 catch (InvalidFileException)
                 {
                     throw new InvalidFileException($"Parsing layer ('{layer.Name}') failed");
                 }
             }
-        }
-
-        private static byte[] ParsePNGToRawBytes(byte[] bytes)
-        {
-            byte[] rawLayerData;
-
-            using MemoryStream pngStream = new MemoryStream(bytes);
-            using Bitmap png = (Bitmap)Image.FromStream(pngStream);
-
-            BitmapData data = png.LockBits(new Rectangle(0, 0, png.Width, png.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            rawLayerData = new byte[Math.Abs(data.Stride * data.Height)];
-            Marshal.Copy(data.Scan0, rawLayerData, 0, rawLayerData.Length);
-
-            return rawLayerData;
         }
     }
 }

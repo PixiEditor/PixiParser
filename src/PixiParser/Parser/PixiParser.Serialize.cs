@@ -1,4 +1,5 @@
 ﻿using MessagePack;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -13,14 +14,12 @@ namespace PixiEditor.Parser
         /// <param name="document">The document to serialize.</param>
         public static void Serialize(SerializableDocument document, Stream stream)
         {
-            BinaryWriter writer = new BinaryWriter(stream);
+            EnsureLayerPng(document);
 
             byte[] messagePack = MessagePackSerializer.Serialize(document, MessagePack.Resolvers.StandardResolverAllowPrivate.Options);
 
-            writer.Write(messagePack.Length);
-            writer.Write(messagePack);
-
-            WriteLayers(document, writer);
+            stream.Write(BitConverter.GetBytes(messagePack.Length));
+            stream.Write(messagePack);
         }
 
         /// <summary>
@@ -30,7 +29,7 @@ namespace PixiEditor.Parser
         /// <returns>The serialized bytes.</returns>
         public static byte[] Serialize(SerializableDocument document)
         {
-            MemoryStream stream = new MemoryStream();
+            MemoryStream stream = new();
 
             Serialize(document, stream);
 
@@ -54,31 +53,26 @@ namespace PixiEditor.Parser
             Serialize(document, stream);
         }
 
-        private static void WriteLayers(SerializableDocument document, BinaryWriter writer)
+        private static void EnsureLayerPng(SerializableDocument document)
         {
             foreach (SerializableLayer layer in document)
             {
-                if (layer.Width * layer.Height == 0)
+                if (layer.PngBytes != null)
                 {
-                    writer.Write(0);
                     continue;
                 }
 
+                if (layer.BitmapBytes == null)
+                {
+                    layer.PngBytes = null;
+                }
+
+                using MemoryStream stream = new();
                 using Bitmap bitmap = layer.ToBitmap();
-                using MemoryStream bitmapStream = new MemoryStream();
 
-                bitmap.Save(bitmapStream, ImageFormat.Png);
+                bitmap.Save(stream, ImageFormat.Png);
 
-                bitmapStream.Seek(0, SeekOrigin.Begin);
-
-                // Layer PNG Data Length
-                writer.Write((int)bitmapStream.Length);
-                bitmapStream.CopyTo(writer.BaseStream);
-            }
-
-            if (document.Layers.Count == 0)
-            {
-                writer.Write(0);
+                layer.PngBytes = stream.ToArray();
             }
         }
     }
