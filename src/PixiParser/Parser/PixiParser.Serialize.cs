@@ -59,7 +59,7 @@ namespace PixiEditor.Parser
         {
             foreach (SerializableLayer layer in document)
             {
-                if (layer.PngBytes != null)
+                if (layer.PngBytes != null || layer.Width * layer.Height == 0)
                 {
                     continue;
                 }

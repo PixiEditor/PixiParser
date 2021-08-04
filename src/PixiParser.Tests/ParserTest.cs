@@ -33,10 +33,10 @@ namespace PixiEditor.Parser.Tests
             var topGuid = Guid.NewGuid();
             var bottomGuid = Guid.NewGuid();
 
-            document.Groups = new Models.SerializableGuidStructureItem[]
+            document.Groups = new SerializableGuidStructureItem[]
             {
-                new Models.SerializableGuidStructureItem(Guid.NewGuid(), "Test name", bottomGuid, topGuid,
-                new Models.SerializableGuidStructureItem[] { new Models.SerializableGuidStructureItem(Guid.NewGuid(), "Test name 1", bottomGuid, topGuid, null, false, 0.7f)}, true, 1f)
+                new SerializableGuidStructureItem(Guid.NewGuid(), "Test name", bottomGuid, topGuid,
+                new SerializableGuidStructureItem[] { new SerializableGuidStructureItem(Guid.NewGuid(), "Test name 1", bottomGuid, topGuid, null, false, 0.7f)}, true, 1f)
             };
 
             byte[] serialized = PixiParser.Serialize(document);
