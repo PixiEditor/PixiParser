@@ -1,10 +1,7 @@
-﻿using MessagePack;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Runtime.Serialization;
-using System.Text;
 
-namespace PixiEditor.Parser.Models
+namespace PixiEditor.Parser
 {
     [DataContract]
     public class SerializableGuidStructureItem
