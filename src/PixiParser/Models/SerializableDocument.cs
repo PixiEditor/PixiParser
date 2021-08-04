@@ -11,7 +11,7 @@ namespace PixiEditor.Parser
     public class SerializableDocument : IEnumerable<SerializableLayer>
     {
         [DataMember(Order = 4)]
-        public Version FileVersion { get; private set; } = PixiParser.FileVersion;
+        public Version FileVersion { get; internal set; }
 
         [DataMember(Order = 0)]
         public int Width { get; set; }

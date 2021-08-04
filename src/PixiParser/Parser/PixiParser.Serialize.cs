@@ -14,6 +14,8 @@ namespace PixiEditor.Parser
         /// <param name="document">The document to serialize.</param>
         public static void Serialize(SerializableDocument document, Stream stream)
         {
+            document.FileVersion = FileVersion;
+
             EnsureLayerPng(document);
 
             byte[] messagePack = MessagePackSerializer.Serialize(document, MessagePack.Resolvers.StandardResolverAllowPrivate.Options);
