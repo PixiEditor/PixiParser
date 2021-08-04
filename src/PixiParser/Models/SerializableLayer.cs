@@ -126,6 +126,11 @@ namespace PixiEditor.Parser
 
         private byte[] GetBitmapBytes()
         {
+            if (Width * Height == 0)
+            {
+                return Array.Empty<byte>();
+            }
+
             if (PngBytes == null)
             {
                 return new byte[Width * 4 * Height];
