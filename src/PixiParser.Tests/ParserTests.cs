@@ -4,7 +4,7 @@ using Xunit;
 
 namespace PixiEditor.Parser.Tests
 {
-    public class ParserTest
+    public class ParserTests
     {
         [Fact]
         public void SerializingAndDeserialzingWorks()
@@ -24,7 +24,7 @@ namespace PixiEditor.Parser.Tests
                 new SerializableLayer(1, 1)
                     {
                         MaxHeight = 1, MaxWidth = 1,
-                        BitmapBytes = imageData,
+                        PngBytes = imageData,
                         IsVisible = true, Name = "Base Layer",
                         Opacity = 1
                 }
@@ -77,19 +77,19 @@ namespace PixiEditor.Parser.Tests
         [Fact]
         public void DetectOldFile()
         {
-            Assert.Throws<OldFileFormatException>(() => PixiParser.Deserialize("./OldPixiFile.pixi"));
+            Assert.Throws<OldFileFormatException>(() => PixiParser.Deserialize("./Files/OldPixiFile.pixi"));
         }
 
         [Fact]
         public void DetectCorruptedFile()
         {
-            Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./CorruptedPixiFile.pixi"));
+            Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./Files/CorruptedPixiFile.pixi"));
         }
 
         [Fact]
         public void CanOpenExistingPixiFile()
         {
-            PixiParser.Deserialize("./Room.pixi");
+            PixiParser.Deserialize("./Files/Room.pixi");
         }
 
         private void AssertEqual(SerializableDocument document, SerializableDocument otherDocument)
@@ -99,7 +99,7 @@ namespace PixiEditor.Parser.Tests
             Assert.Equal(document.Width, otherDocument.Width);
             Assert.Equal(document.Swatches.Count, otherDocument.Swatches.Count);
 
-            Assert.Equal(document.Layers[0].BitmapBytes, otherDocument.Layers[0].BitmapBytes);
+            Assert.Equal(document.Layers[0].PngBytes, otherDocument.Layers[0].PngBytes);
         }
     }
 }

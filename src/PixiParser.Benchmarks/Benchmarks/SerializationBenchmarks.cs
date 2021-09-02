@@ -1,32 +1,32 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using SkiaSharp;
 
 namespace PixiEditor.Parser.Benchmarks
 {
-    [SimpleJob(RuntimeMoniker.NetCoreApp50, baseline: true)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-    [HtmlExporter]
-    [MarkdownExporterAttribute.GitHub]
-    public class SerializationBenchmarks
+    public partial class Benchmarks
     {
         private SerializableDocument benchmarkDocument;
+        private SKBitmap[] bitmaps;
 
-        [Params(32, 64, 1920)]
-        public int Size;
-
-        [Params(1, 4)]
-        public int Layers;
-
-        [GlobalSetup]
-        public void Setup()
+        [Benchmark]
+        public byte[] Serialize()
         {
-            benchmarkDocument = Helper.CreateDocument(Size, Layers);
+            return PixiParser.Serialize(benchmarkDocument);
         }
 
         [Benchmark]
-        public void Serialize()
+        public byte[] SerializeAndCreate()
         {
-            PixiParser.Serialize(benchmarkDocument);
+            SerializableDocument document = Helper.CreateDocument(Size, Layers, false);
+
+            for (int i = 0; i < Layers; i++)
+            {
+                SKData encoded = bitmaps[i].Encode(SKEncodedImageFormat.Png, 100);
+                document.Layers[i].PngBytes = encoded.AsSpan().ToArray();
+            }
+
+            return PixiParser.Serialize(benchmarkDocument);
         }
     }
 }

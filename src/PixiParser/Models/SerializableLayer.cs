@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace PixiEditor.Parser
@@ -11,8 +7,6 @@ namespace PixiEditor.Parser
     [DataContract]
     public class SerializableLayer
     {
-        private byte[] bitmapBytes;
-
         [DataMember(Order = 4)]
         public string Name { get; set; }
 
@@ -28,27 +22,8 @@ namespace PixiEditor.Parser
         [IgnoreDataMember]
         public int MaxHeight { get; set; }
 
-        [IgnoreDataMember]
-        public byte[] BitmapBytes
-        {
-            get
-            {
-                if (bitmapBytes == null)
-                {
-                    bitmapBytes = GetBitmapBytes();
-                }
-
-                return bitmapBytes;
-            }
-            set
-            {
-                PngBytes = null;
-                bitmapBytes = value;
-            }
-        }
-
         [DataMember(Order = 8)]
-        internal byte[] PngBytes { get; set; }
+        public byte[] PngBytes { get; set; }
 
         [DataMember(Order = 5)]
         public bool IsVisible { get; set; }
@@ -85,13 +60,6 @@ namespace PixiEditor.Parser
             OffsetY = offsetY;
         }
 
-        public Bitmap ToBitmap()
-        {
-            return new Bitmap(Width, Height, Width * 4,
-                     PixelFormat.Format32bppArgb,
-                     Marshal.UnsafeAddrOfPinnedArrayElement(BitmapBytes, 0));
-        }
-
         public override bool Equals(object obj)
         {
             if (obj is not SerializableLayer layer)
@@ -110,7 +78,7 @@ namespace PixiEditor.Parser
             hashCode.Add(Height);
             hashCode.Add(MaxWidth);
             hashCode.Add(MaxHeight);
-            hashCode.Add(BitmapBytes);
+            hashCode.Add(PngBytes);
             hashCode.Add(IsVisible);
             hashCode.Add(OffsetX);
             hashCode.Add(OffsetY);
@@ -121,31 +89,7 @@ namespace PixiEditor.Parser
         protected bool Equals(SerializableLayer other)
         {
             return Name == other.Name && Width == other.Width && Height == other.Height && MaxWidth == other.MaxWidth && MaxHeight == other.MaxHeight &&
-                   BitmapBytes.SequenceEqual(other.BitmapBytes) && IsVisible == other.IsVisible && OffsetX == other.OffsetX && OffsetY == other.OffsetY && Opacity.Equals(other.Opacity);
-        }
-
-        private byte[] GetBitmapBytes()
-        {
-            if (Width * Height == 0)
-            {
-                return Array.Empty<byte>();
-            }
-
-            if (PngBytes == null)
-            {
-                return new byte[Width * 4 * Height];
-            }
-
-            byte[] rawLayerData;
-
-            using MemoryStream pngStream = new MemoryStream(PngBytes);
-            using Bitmap png = (Bitmap)Image.FromStream(pngStream);
-
-            BitmapData data = png.LockBits(new Rectangle(0, 0, png.Width, png.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            rawLayerData = new byte[Math.Abs(data.Stride * data.Height)];
-            Marshal.Copy(data.Scan0, rawLayerData, 0, rawLayerData.Length);
-
-            return rawLayerData;
+                   PngBytes.SequenceEqual(other.PngBytes) && IsVisible == other.IsVisible && OffsetX == other.OffsetX && OffsetY == other.OffsetY && Opacity.Equals(other.Opacity);
         }
     }
 }

@@ -1,16 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net5.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net5.0;net47</TargetFrameworks>
+    <LangVersion>9.0</LangVersion>
     <RootNamespace>PixiEditor.Parser.Benchmarks</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+    <PackageReference Include="SkiaSharp" Version="2.80.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PixiParser.Skia\PixiParser.Skia.csproj" />
     <ProjectReference Include="..\PixiParser\PixiParser.csproj" />
   </ItemGroup>
 

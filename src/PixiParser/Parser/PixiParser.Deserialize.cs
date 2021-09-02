@@ -60,7 +60,12 @@ namespace PixiEditor.Parser
             stream.Position += 22;
 
             byte[] buffer = new byte[8];
+
+#if NET5_0_OR_GREATER
             stream.Read(buffer);
+#else
+            stream.Read(buffer, 0, 8);
+#endif
 
             stream.Position -= 22 + 8;
 
@@ -72,10 +77,28 @@ namespace PixiEditor.Parser
 
         private static byte[] GetMessagePack(Stream stream)
         {
-            byte[] length = new byte[4];
-            stream.Read(length);
-            byte[] buffer = new byte[BitConverter.ToInt32(length)];
-            stream.Read(buffer, 0, buffer.Length);
+            byte[] lengthBytes = new byte[4];
+
+#if NET5_0_OR_GREATER
+            stream.Read(lengthBytes);
+            int length = BitConverter.ToInt32(lengthBytes);
+#else
+            stream.Read(lengthBytes, 0, 4);
+            int length = BitConverter.ToInt32(lengthBytes, 0);
+#endif
+            byte[] buffer = new byte[length];
+
+#if NET5_0_OR_GREATER
+            int read = stream.Read(buffer);
+#else
+            int read = stream.Read(buffer, 0, buffer.Length);
+#endif
+
+            if (read != length)
+            {
+                throw new InvalidFileException("Stream size did not match document size");
+            }
+
             return buffer;
         }
 
@@ -90,7 +113,7 @@ namespace PixiEditor.Parser
             }
             catch (MessagePackSerializationException)
             {
-                throw new InvalidFileException("Message Pack could not be deserialize");
+                throw new InvalidFileException("Message Pack could not be deserialized");
             }
         }
 
@@ -99,8 +122,8 @@ namespace PixiEditor.Parser
             foreach (SerializableLayer layer in document)
             {
                 byte[] layerLength = new byte[4];
-                stream.Read(layerLength);
-                int layerLengthI = BitConverter.ToInt32(layerLength);
+                stream.Read(layerLength, 0, 4);
+                int layerLengthI = BitConverter.ToInt32(layerLength, 0);
 
                 if (layerLengthI == 0)
                 {
@@ -110,11 +133,11 @@ namespace PixiEditor.Parser
                 try
                 {
                     layer.PngBytes = new byte[layerLengthI];
-                    stream.Read(layer.PngBytes);
+                    stream.Read(layer.PngBytes, 0, layerLengthI);
                 }
                 catch (InvalidFileException)
                 {
-                    throw new InvalidFileException($"Parsing layer ('{layer.Name}') failed");
+                    throw new InvalidFileException($"Parsing png bytes from layer ('{layer.Name}') failed");
                 }
             }
         }
