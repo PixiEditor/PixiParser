@@ -111,9 +111,9 @@ namespace PixiEditor.Parser
                     MessagePack.Resolvers.StandardResolverAllowPrivate.Options
                         .WithSecurity(MessagePackSecurity.UntrustedData));
             }
-            catch (MessagePackSerializationException)
+            catch (MessagePackSerializationException e)
             {
-                throw new InvalidFileException("Message Pack could not be deserialized");
+                throw new InvalidFileException("Message Pack could not be deserialized", e);
             }
         }
 
