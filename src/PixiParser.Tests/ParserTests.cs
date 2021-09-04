@@ -9,7 +9,7 @@ namespace PixiEditor.Parser.Tests
         [Fact]
         public void SerializingAndDeserialzingWorks()
         {
-            SerializableDocument document = new SerializableDocument
+            SerializableDocument document = new()
             {
                 Height = 1,
                 Width = 1
@@ -49,7 +49,7 @@ namespace PixiEditor.Parser.Tests
         [Fact]
         public void SerializeAndDeserializeEmptyLayer()
         {
-            SerializableDocument document = new SerializableDocument
+            SerializableDocument document = new()
             {
                 Width = 1,
                 Height = 1

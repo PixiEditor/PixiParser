@@ -59,7 +59,7 @@ namespace PixiEditor.Parser
         /// <returns>The total number of bytes written to the file.</returns>
         public static int Serialize(SerializableDocument document, string path)
         {
-            using FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write);
+            using FileStream stream = new(path, FileMode.Create, FileAccess.Write);
 
             return Serialize(document, stream);
         }

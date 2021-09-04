@@ -8,7 +8,7 @@ namespace PixiEditor.Parser
     {
         public static List<Color> BytesToSwatches(byte[] bytes)
         {
-            List<Color> swatches = new List<Color>();
+            List<Color> swatches = new();
 
             if (bytes is null)
             {
@@ -36,7 +36,7 @@ namespace PixiEditor.Parser
                 return Array.Empty<byte>();
             }
 
-            List<byte> tupleData = new List<byte>();
+            List<byte> tupleData = new();
 
             foreach (var color in swatches)
             {

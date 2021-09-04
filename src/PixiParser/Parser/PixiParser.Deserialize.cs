@@ -51,7 +51,7 @@ namespace PixiEditor.Parser
         /// <returns>The deserialized document.</returns>
         public static SerializableDocument Deserialize(string path)
         {
-            using FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+            using FileStream stream = new(path, FileMode.Open, FileAccess.Read);
 
             return Deserialize(stream);
         }

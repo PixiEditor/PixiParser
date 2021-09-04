@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net5.0;net47</TargetFrameworks>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>Latest</LangVersion>
     <RootNamespace>PixiEditor.Parser.Benchmarks</RootNamespace>
   </PropertyGroup>
 
