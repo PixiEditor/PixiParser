@@ -11,16 +11,22 @@ namespace PixiEditor.Parser
             new byte[] { 0x41, 0x50, 0x69, 0x78, 0x69, 0x45, 0x64, 0x69 };
 
         /// <summary>
-        /// Deserializes to a <see cref="SerializableDocument"/>.
+        /// Deserializes a stream containing a .pixi file to a <see cref="SerializableDocument"/>.
         /// </summary>
-        /// <param name="path">The stream to deserialize from</param>
-        /// <param name="streamPosition">From where to start reading the stream, use null to start from current position.</param>
-        /// <returns>The deserialized Document.</returns>
-        public static SerializableDocument Deserialize(Stream stream)
+        /// <returns>The deserialized document.</returns>
+        public static SerializableDocument Deserialize(Stream stream) => Deserialize(stream, out _);
+
+        /// <summary>
+        /// Deserializes a stream containing a .pixi file to a <see cref="SerializableDocument"/>.
+        /// </summary>
+        /// <param name="stream">The stream to deserialize from</param>
+        /// <param name="bytesRead">The total number of bytes read from the stream</param>
+        /// <returns>The deserialized document.</returns>
+        public static SerializableDocument Deserialize(Stream stream, out int bytesRead)
         {
             ThrowIfOldFormat(stream);
 
-            byte[] msgPack = GetMessagePack(stream);
+            byte[] msgPack = GetMessagePack(stream, out bytesRead);
 
             SerializableDocument document = ParseDocument(msgPack);
 
@@ -39,10 +45,10 @@ namespace PixiEditor.Parser
         public static SerializableDocument Deserialize(byte[] bytes) => Deserialize(new MemoryStream(bytes));
 
         /// <summary>
-        /// Deserializes to a <see cref="SerializableDocument"/>.
+        /// Deserializes a .pixi file to a <see cref="SerializableDocument"/>
         /// </summary>
         /// <param name="path">The path to the .pixi file</param>
-        /// <returns>The deserialized Document.</returns>
+        /// <returns>The deserialized document.</returns>
         public static SerializableDocument Deserialize(string path)
         {
             using FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
@@ -75,7 +81,7 @@ namespace PixiEditor.Parser
             }
         }
 
-        private static byte[] GetMessagePack(Stream stream)
+        private static byte[] GetMessagePack(Stream stream, out int bytesRead)
         {
             byte[] lengthBytes = new byte[4];
 
@@ -93,6 +99,8 @@ namespace PixiEditor.Parser
 #else
             int read = stream.Read(buffer, 0, buffer.Length);
 #endif
+
+            bytesRead = read + 4;
 
             if (read != length)
             {
