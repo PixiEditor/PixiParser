@@ -87,7 +87,13 @@ namespace PixiEditor.Parser.Tests
         }
 
         [Fact]
-        public void CanOpenExistingPixiFile()
+        public void CanOpenExistingFile()
+        {
+            PixiParser.Deserialize("./Files/AtomLogo.pixi");
+        }
+
+        [Fact]
+        public void IsBackwardsCompatible()
         {
             PixiParser.Deserialize("./Files/Room.pixi");
         }

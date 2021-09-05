@@ -27,6 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Files\AtomLogo.pixi">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Files\CorruptedPixiFile.pixi">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
