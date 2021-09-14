@@ -54,19 +54,5 @@ namespace PixiEditor.Parser.Skia
 
             return layer;
         }
-
-        /// <summary>
-        /// Iterates the <see cref="Color"/>'s in the <paramref name="collection"/> collection and converts them into <see cref="SKColor"/>'s
-        /// </summary>
-        public static IEnumerable<SKColor> ToSKColors(this SwatchCollection collection)
-        {
-            foreach (Color color in collection)
-            {
-                yield return new SKColor(color.R,
-                                         color.G,
-                                         color.B,
-                                         color.A);
-            }
-        }
     }
 }

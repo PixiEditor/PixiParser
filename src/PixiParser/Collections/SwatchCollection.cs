@@ -23,11 +23,17 @@ namespace PixiEditor.Parser.Collections
             : base(colors)
         { }
 
-        public void Add(byte r, byte g, byte b) => Add(Color.FromArgb(r, g, b));
+        public Color Add(byte r, byte g, byte b) => AddReturn(Color.FromArgb(r, g, b));
 
-        public void Add(byte a, byte r, byte g, byte b) => Add(Color.FromArgb(a, r, g, b));
+        public Color Add(byte a, byte r, byte g, byte b) => AddReturn(Color.FromArgb(a, r, g, b));
 
-        public void Add(int argb) => Add(Color.FromArgb(argb));
+        public Color Add(int argb) => AddReturn(Color.FromArgb(argb));
+
+        private Color AddReturn(Color color)
+        {
+            Add(color);
+            return color;
+        }
 
         internal void FromByteArray(byte[] bytes)
         {
