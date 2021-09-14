@@ -21,6 +21,14 @@ namespace PixiEditor.Parser.Skia
             }
         }
 
+        public static void AddRange(this SwatchCollection collection, IEnumerable<SKColor> colors)
+        {
+            foreach (SKColor color in colors)
+            {
+                collection.Add(color);
+            }
+        }
+
         /// <summary>
         /// Add's the <paramref name="color"/> to the <paramref name="collection"/> and returns the new <see cref="Color"/> instance
         /// </summary>
