@@ -107,13 +107,6 @@ namespace PixiEditor.Parser
             Groups = new List<SerializableGroup>();
         }
 
-        public SerializableDocument(SerializableDocument original)
-        {
-            FileVersion = original.FileVersion;
-            Width = original.Width;
-            Height = original.Height;
-        }
-
         /// <summary>
         /// Creates a new empty document
         /// </summary>
