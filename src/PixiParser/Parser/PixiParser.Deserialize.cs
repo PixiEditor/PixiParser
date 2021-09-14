@@ -1,4 +1,5 @@
 ﻿using MessagePack;
+using PixiEditor.Parser.Helpers;
 using System;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,9 @@ namespace PixiEditor.Parser
         /// <returns>The deserialized document.</returns>
         public static SerializableDocument Deserialize(Stream stream) => Deserialize(stream, out _);
 
+        // Version when the layer bitmap were not stored in the message pack
+        private static readonly Version parseLayerVersion = new(2, 0);
+
         /// <summary>
         /// Deserializes a stream containing a .pixi file to a <see cref="SerializableDocument"/>.
         /// </summary>
@@ -30,7 +34,7 @@ namespace PixiEditor.Parser
 
             SerializableDocument document = ParseDocument(msgPack);
 
-            if (document.FileVersion < new Version(2, 0))
+            if (document.FileVersion < parseLayerVersion)
             {
                 ParseLayers(ref document, stream);
             }

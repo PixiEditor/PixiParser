@@ -12,7 +12,7 @@ namespace PixiEditor.Parser.Tests
         [Fact]
         public void CanCreateSKBitmapFromLayer()
         {
-            SerializableDocument document = PixiParser.Deserialize("./Files/Room.pixi");
+            SerializableDocument document = PixiParser.Deserialize("./Files/16x16,PPD-3.pixi");
 
             SerializableLayer layer = document.Layers[0];
             using SKBitmap bitmap = layer.ToSKBitmap();
@@ -23,7 +23,7 @@ namespace PixiEditor.Parser.Tests
         [Fact]
         public void CanCreateSKImageFromLayer()
         {
-            SerializableDocument document = PixiParser.Deserialize("./Files/Room.pixi");
+            SerializableDocument document = PixiParser.Deserialize("./Files/16x16,PPD-3.pixi");
 
             SerializableLayer layer = document.Layers[0];
             using SKImage image = layer.ToSKImage();

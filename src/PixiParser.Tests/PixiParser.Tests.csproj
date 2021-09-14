@@ -27,16 +27,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Files\AtomLogo.pixi">
+    <None Update="Files\16x16,PE-0.6.pixi">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Files\16x16,PPD-3.pixi">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Files\CorruptedPixiFile.pixi">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Files\OldPixiFile.pixi">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Files\Room.pixi">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

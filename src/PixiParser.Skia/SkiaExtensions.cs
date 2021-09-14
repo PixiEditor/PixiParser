@@ -1,5 +1,7 @@
-using PixiEditor.Parser;
+using PixiEditor.Parser.Collections;
 using SkiaSharp;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace PixiEditor.Parser.Skia
 {
@@ -22,16 +24,49 @@ namespace PixiEditor.Parser.Skia
         }
 
         /// <summary>
-        /// Encodes the <paramref name="bitmap"/> into the png bytes of the layer.
+        /// Encodes the <paramref name="bitmap"/> into the png bytes of the layer
         /// </summary>
         /// <param name="bitmap">The bitmap that should be encoded</param>
-        public static void FromSKBitmap(this SerializableLayer layer, SKBitmap bitmap)
+        /// <returns><paramref name="layer"/></returns>
+        public static SerializableLayer FromSKBitmap(this SerializableLayer layer, SKBitmap bitmap)
         {
             using SKData data = bitmap.Encode(SKEncodedImageFormat.Png, 100);
 
             layer.PngBytes = data.AsSpan().ToArray();
             layer.Width = bitmap.Width;
             layer.Height = bitmap.Height;
+
+            return layer;
+        }
+
+        /// <summary>
+        /// Encodes the <paramref name="image"/> into the png bytes of the layer
+        /// </summary>
+        /// <param name="bitmap">The bitmap that should be encoded</param>
+        /// <returns><paramref name="image"/></returns>
+        public static SerializableLayer FromSKImage(this SerializableLayer layer, SKImage image)
+        {
+            using SKData data = image.Encode();
+
+            layer.PngBytes = data.AsSpan().ToArray();
+            layer.Width = image.Width;
+            layer.Height = image.Height;
+
+            return layer;
+        }
+
+        /// <summary>
+        /// Iterates the <see cref="Color"/>'s in the <paramref name="collection"/> collection and converts them into <see cref="SKColor"/>'s
+        /// </summary>
+        public static IEnumerable<SKColor> ToSKColors(this SwatchCollection collection)
+        {
+            foreach (Color color in collection)
+            {
+                yield return new SKColor(color.R,
+                                         color.G,
+                                         color.B,
+                                         color.A);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using PixiEditor.Parser.Skia;
+﻿using PixiEditor.Parser.Collections;
+using PixiEditor.Parser.Skia;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,10 @@ namespace PixiEditor.Parser.Benchmarks
             var benchmarkDocument = new SerializableDocument()
             {
                 Width = size,
-                Height = size,
-                Swatches = new List<Color> { Color.FromArgb(255, 255, 255, 255) },
-                Layers = new List<SerializableLayer>()
+                Height = size
             };
+
+            benchmarkDocument.Swatches.Add(255, 255, 255, 255);
 
             for (int i = 0; i < layers; i++)
             {

@@ -15,29 +15,12 @@ namespace PixiEditor.Parser.Tests
                 Width = 1
             };
 
-            document.AddSwatch(255, 255, 255);
+            document.Swatches.Add(255, 255, 255);
 
-            byte[] imageData = new byte[] { 255, 255, 255, 255 };
+            SerializableLayer layer = document.Layers.Add("Base Layer", 1, 1, false, 0.5f, 1, 1);
+            layer.PngBytes = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF };
 
-            document.Layers = new List<SerializableLayer>
-            {
-                new SerializableLayer(1, 1)
-                    {
-                        MaxHeight = 1, MaxWidth = 1,
-                        PngBytes = imageData,
-                        IsVisible = true, Name = "Base Layer",
-                        Opacity = 1
-                }
-            };
-
-            var topGuid = Guid.NewGuid();
-            var bottomGuid = Guid.NewGuid();
-
-            document.Groups = new SerializableGuidStructureItem[]
-            {
-                new SerializableGuidStructureItem(Guid.NewGuid(), "Test name", bottomGuid, topGuid,
-                new SerializableGuidStructureItem[] { new SerializableGuidStructureItem(Guid.NewGuid(), "Test name 1", bottomGuid, topGuid, null, false, 0.7f)}, true, 1f)
-            };
+            document.Groups.Add(new SerializableGroup("Base Group"));
 
             byte[] serialized = PixiParser.Serialize(document);
 
@@ -55,17 +38,7 @@ namespace PixiEditor.Parser.Tests
                 Height = 1
             };
 
-            document.Layers = new List<SerializableLayer>()
-            {
-                new SerializableLayer()
-                {
-                    Width = 0, Height = 0,
-                    MaxHeight = 1, MaxWidth = 1,
-                    IsVisible = true,
-                    Name = "Base Layer", Opacity = 1,
-                    OffsetX = 0, OffsetY = 0,
-                }
-            };
+            document.Layers.Add("Base Layer");
 
             var serialized = PixiParser.Serialize(document);
 
@@ -89,23 +62,80 @@ namespace PixiEditor.Parser.Tests
         [Fact]
         public void CanOpenExistingFile()
         {
-            PixiParser.Deserialize("./Files/AtomLogo.pixi");
+            PixiParser.Deserialize("./Files/16x16,PPD-3.pixi");
         }
 
         [Fact]
         public void IsBackwardsCompatible()
         {
-            PixiParser.Deserialize("./Files/Room.pixi");
+            PixiParser.Deserialize("./Files/16x16,PE-0.6.pixi");
         }
 
-        private void AssertEqual(SerializableDocument document, SerializableDocument otherDocument)
+        [Fact]
+        public void LayerStructureWorks()
+        {
+            SerializableDocument document = new();
+
+            SerializableLayer layer1 = document.Layers.Add("Test Layer 1");
+            SerializableLayer layer2 = document.Layers.Add("Test Layer 2");
+            SerializableLayer layer3 = document.Layers.Add("Test Layer 3");
+            SerializableLayer layer4 = document.Layers.Add("Test Layer 4");
+
+            SerializableGroup group1 = new("Group 1");
+            SerializableGroup group2 = new("Group 1|1");
+            group1.Subgroups.Add(group2);
+            SerializableGroup group3 = new("Group 2");
+
+            document.Groups.Add(group1);
+            document.Groups.Add(group2);
+            document.Groups.Add(group3);
+
+            document.Layers.AddToGroup(group1, layer1);
+            document.Layers.AddToGroup(group2, layer2);
+            document.Layers.AddToGroup(group1, layer3);
+
+            document.Layers.AddToGroup(group3, layer4);
+
+            Assert.Equal(0, document.Groups[0].StartLayer);
+            Assert.Equal(2, document.Groups[0].EndLayer);
+
+            Assert.Equal(1, document.Groups[1].StartLayer);
+            Assert.Equal(1, document.Groups[1].EndLayer);
+
+            Assert.Equal(3, document.Groups[2].StartLayer);
+            Assert.Equal(3, document.Groups[2].EndLayer);
+
+            Assert.True(document.Layers.ContainedIn(group1, layer1));
+            Assert.True(document.Layers.ContainedIn(group1, layer2));
+            Assert.True(document.Layers.ContainedIn(group1, layer3));
+            Assert.True(document.Layers.ContainedIn(group2, layer2));
+            Assert.False(document.Layers.ContainedIn(group1, layer4));
+            Assert.True(document.Layers.ContainedIn(group3, layer4));
+        }
+
+        private static void AssertEqual(SerializableDocument document, SerializableDocument otherDocument)
         {
             Assert.Equal(document.FileVersion, otherDocument.FileVersion);
             Assert.Equal(document.Height, otherDocument.Height);
             Assert.Equal(document.Width, otherDocument.Width);
             Assert.Equal(document.Swatches.Count, otherDocument.Swatches.Count);
+            Assert.Equal(document.Layers.Count, document.Layers.Count);
+            Assert.Equal(document.Groups.Count, document.Groups.Count);
 
-            Assert.Equal(document.Layers[0].PngBytes, otherDocument.Layers[0].PngBytes);
+            for (int i = 0; i < document.Swatches.Count; i++)
+            {
+                Assert.Equal(document.Swatches[i], otherDocument.Swatches[i]);
+            }
+
+            for (int i = 0; i < document.Layers.Count; i++)
+            {
+                Assert.Equal(document.Layers[i], otherDocument.Layers[i]);
+            }
+
+            for (int i = 0; i < document.Groups.Count; i++)
+            {
+                Assert.Equal(document.Groups[i], otherDocument.Groups[i]);
+            }
         }
     }
 }
