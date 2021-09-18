@@ -6,8 +6,7 @@ namespace PixiEditor.Parser.Benchmarks
     {
         static void Main()
         {
-            BenchmarkRunner.Run<SerializationBenchmarks>();
-            BenchmarkRunner.Run<DeserializationBenchmarks>();
+            BenchmarkRunner.Run<Benchmarks>();
         }
     }
 }

@@ -1,32 +1,15 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 
 namespace PixiEditor.Parser.Benchmarks
 {
-    [SimpleJob(RuntimeMoniker.NetCoreApp50, baseline: true)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-    [HtmlExporter]
-    [MarkdownExporterAttribute.GitHub]
-    public class DeserializationBenchmarks
+    public partial class Benchmarks
     {
-        private byte[] benchmarkDocument;
-
-        [Params(32, 64, 1920)]
-        public int Size;
-
-        [Params(1, 4)]
-        public int Layers;
-
-        [GlobalSetup]
-        public void Setup()
-        {
-            benchmarkDocument = PixiParser.Serialize(Helper.CreateDocument(Size, Layers));
-        }
+        private byte[] benchmarkDocumentBytes;
 
         [Benchmark]
-        public void Deserialize()
+        public SerializableDocument Deserialize()
         {
-            PixiParser.Deserialize(benchmarkDocument);
+            return PixiParser.Deserialize(benchmarkDocumentBytes);
         }
     }
 }

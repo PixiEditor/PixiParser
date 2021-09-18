@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
 
@@ -9,30 +9,34 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="1.3.0">
+    <PackageReference Include="coverlet.collector" Version="3.1.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PixiParser.Skia\PixiParser.Skia.csproj" />
     <ProjectReference Include="..\PixiParser\PixiParser.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="CorruptedPixiFile.pixi">
+    <None Update="Files\16x16,PE-0.6.pixi">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="OldPixiFile.pixi">
+    <None Update="Files\16x16,PPD-3.pixi">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Room.pixi">
+    <None Update="Files\CorruptedPixiFile.pixi">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Files\OldPixiFile.pixi">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

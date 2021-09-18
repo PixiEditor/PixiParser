@@ -1,7 +1,5 @@
 ﻿using MessagePack;
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 
 namespace PixiEditor.Parser
@@ -12,16 +10,22 @@ namespace PixiEditor.Parser
         /// Serializes a <see cref="SerializableDocument"/> into bytes and saves them into a stream.
         /// </summary>
         /// <param name="document">The document to serialize.</param>
-        public static void Serialize(SerializableDocument document, Stream stream)
+        /// <returns>The total number of bytes written to the stream.</returns>
+        public static int Serialize(SerializableDocument document, Stream stream)
         {
             document.FileVersion = FileVersion;
 
-            EnsureLayerPng(document);
-
             byte[] messagePack = MessagePackSerializer.Serialize(document, MessagePack.Resolvers.StandardResolverAllowPrivate.Options);
 
+#if NET5_0_OR_GREATER
             stream.Write(BitConverter.GetBytes(messagePack.Length));
             stream.Write(messagePack);
+#else
+            stream.Write(BitConverter.GetBytes(messagePack.Length), 0, 4);
+            stream.Write(messagePack, 0, messagePack.Length);
+#endif
+
+            return messagePack.Length + 4;
         }
 
         /// <summary>
@@ -39,43 +43,25 @@ namespace PixiEditor.Parser
 
             byte[] buffer = new byte[stream.Length];
 
+#if NET5_0_OR_GREATER
+            stream.Read(buffer);
+#else
             stream.Read(buffer, 0, buffer.Length);
+#endif
 
             return buffer;
         }
 
         /// <summary>
-        /// Serializes a <see cref="SerializableDocument"/> into bytes and saves them into a file.
+        /// Serializes a <see cref="SerializableDocument"/> and saves it in a file.
         /// </summary>
         /// <param name="document">The document to serialize.</param>
-        public static void Serialize(SerializableDocument document, string path)
+        /// <returns>The total number of bytes written to the file.</returns>
+        public static int Serialize(SerializableDocument document, string path)
         {
-            using FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write);
+            using FileStream stream = new(path, FileMode.Create, FileAccess.Write);
 
-            Serialize(document, stream);
-        }
-
-        private static void EnsureLayerPng(SerializableDocument document)
-        {
-            foreach (SerializableLayer layer in document)
-            {
-                if (layer.PngBytes != null || layer.Width * layer.Height == 0)
-                {
-                    continue;
-                }
-
-                if (layer.BitmapBytes == null)
-                {
-                    layer.PngBytes = null;
-                }
-
-                using MemoryStream stream = new();
-                using Bitmap bitmap = layer.ToBitmap();
-
-                bitmap.Save(stream, ImageFormat.Png);
-
-                layer.PngBytes = stream.ToArray();
-            }
+            return Serialize(document, stream);
         }
     }
 }
