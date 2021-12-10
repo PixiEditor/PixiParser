@@ -1,0 +1,9 @@
+[*.cs]
+
+# IDE0022: Use block body for methods
+csharp_style_expression_bodied_methods =when_on_single_line:warning
+csharp_style_namespace_declarations=file_scoped:warning
+csharp_new_line_before_open_brace=all
+
+[*.{cs,vb}]
+end_of_line=crlf

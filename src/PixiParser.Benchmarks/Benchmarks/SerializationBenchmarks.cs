@@ -1,32 +1,30 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 using SkiaSharp;
 
-namespace PixiEditor.Parser.Benchmarks
+namespace PixiEditor.Parser.Benchmarks;
+
+public partial class Benchmarks
 {
-    public partial class Benchmarks
+    private SerializableDocument benchmarkDocument;
+    private SKBitmap[] bitmaps;
+
+    [Benchmark]
+    public byte[] Serialize()
     {
-        private SerializableDocument benchmarkDocument;
-        private SKBitmap[] bitmaps;
+        return PixiParser.Serialize(benchmarkDocument);
+    }
 
-        [Benchmark]
-        public byte[] Serialize()
+    [Benchmark]
+    public byte[] SerializeAndCreate()
+    {
+        SerializableDocument document = Helper.CreateDocument(Size, Layers, false);
+
+        for (int i = 0; i < Layers; i++)
         {
-            return PixiParser.Serialize(benchmarkDocument);
+            SKData encoded = bitmaps[i].Encode(SKEncodedImageFormat.Png, 100);
+            document.Layers[i].PngBytes = encoded.AsSpan().ToArray();
         }
 
-        [Benchmark]
-        public byte[] SerializeAndCreate()
-        {
-            SerializableDocument document = Helper.CreateDocument(Size, Layers, false);
-
-            for (int i = 0; i < Layers; i++)
-            {
-                SKData encoded = bitmaps[i].Encode(SKEncodedImageFormat.Png, 100);
-                document.Layers[i].PngBytes = encoded.AsSpan().ToArray();
-            }
-
-            return PixiParser.Serialize(benchmarkDocument);
-        }
+        return PixiParser.Serialize(benchmarkDocument);
     }
 }
