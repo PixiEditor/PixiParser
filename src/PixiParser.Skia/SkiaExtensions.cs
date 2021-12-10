@@ -52,7 +52,12 @@ public static class SkiaExtensions
         return layer;
     }
 
-    public static SKBitmap ToSKBitmap(this SerializableDocument document)
+    /// <summary>
+    /// Draws all layers on top of a <see cref="SKBitmap"/>
+    /// </summary>
+    /// <param name="document"></param>
+    /// <returns>The <see cref="SKBitmap"/> instance</returns>
+    public static SKBitmap LayersToSKBitmap(this SerializableDocument document)
     {
         SKImageInfo info = new(document.Width, document.Height, SKColorType.RgbaF32, SKAlphaType.Unpremul, SKColorSpace.CreateSrgb());
         using SKSurface surface = SKSurface.Create(info);
