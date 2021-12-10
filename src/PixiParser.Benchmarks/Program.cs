@@ -1,11 +1,4 @@
-﻿using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Running;
+using PixiEditor.Parser.Benchmarks;
 
-namespace PixiEditor.Parser.Benchmarks;
-
-internal class Program
-{
-    static void Main()
-    {
-        BenchmarkRunner.Run<Benchmarks>();
-    }
-}
+BenchmarkRunner.Run<Benchmarks>();
