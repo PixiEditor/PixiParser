@@ -1,32 +1,30 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 
-namespace PixiEditor.Parser.Benchmarks
+namespace PixiEditor.Parser.Benchmarks;
+
+[SimpleJob(RuntimeMoniker.Net60, baseline: true)]
+[HtmlExporter]
+[MarkdownExporterAttribute.GitHub]
+public partial class Benchmarks
 {
-    [SimpleJob(RuntimeMoniker.NetCoreApp50, baseline: true)]
-    [SimpleJob(RuntimeMoniker.Net47)]
-    [HtmlExporter]
-    [MarkdownExporterAttribute.GitHub]
-    public partial class Benchmarks
+    [Params(64, 1920)]
+    public int Size;
+
+    [Params(1, 4)]
+    public int Layers;
+
+    [GlobalSetup]
+    public void Setup()
     {
-        [Params(64, 1920)]
-        public int Size;
+        benchmarkDocumentBytes = PixiParser.Serialize(Helper.CreateDocument(Size, Layers));
+        benchmarkDocument = Helper.CreateDocument(Size, Layers);
 
-        [Params(1, 4)]
-        public int Layers;
+        bitmaps = new SkiaSharp.SKBitmap[Layers];
 
-        [GlobalSetup]
-        public void Setup()
+        for (int i = 0; i < Layers; i++)
         {
-            benchmarkDocumentBytes = PixiParser.Serialize(Helper.CreateDocument(Size, Layers));
-            benchmarkDocument = Helper.CreateDocument(Size, Layers);
-
-            bitmaps = new SkiaSharp.SKBitmap[Layers];
-
-            for (int i = 0; i < Layers; i++)
-            {
-                bitmaps[i] = Helper.CreateSKBitmap(Size);
-            }
+            bitmaps[i] = Helper.CreateSKBitmap(Size);
         }
     }
 }

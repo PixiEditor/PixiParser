@@ -1,15 +1,14 @@
 ﻿using BenchmarkDotNet.Attributes;
 
-namespace PixiEditor.Parser.Benchmarks
-{
-    public partial class Benchmarks
-    {
-        private byte[] benchmarkDocumentBytes;
+namespace PixiEditor.Parser.Benchmarks;
 
-        [Benchmark]
-        public SerializableDocument Deserialize()
-        {
-            return PixiParser.Deserialize(benchmarkDocumentBytes);
-        }
+public partial class Benchmarks
+{
+    private byte[] benchmarkDocumentBytes;
+
+    [Benchmark]
+    public SerializableDocument Deserialize()
+    {
+        return PixiParser.Deserialize(benchmarkDocumentBytes);
     }
 }

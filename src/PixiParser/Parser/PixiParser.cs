@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace PixiEditor.Parser
+namespace PixiEditor.Parser;
+
+public partial class PixiParser
 {
-    public partial class PixiParser
-    {
-        public static Version FileVersion { get; } = new(3, 0, 0, 0);
-    }
+    public static Version FileVersion { get; } = new(3, 0, 0, 0);
 }
