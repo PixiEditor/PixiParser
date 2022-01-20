@@ -1,4 +1,5 @@
 using SkiaSharp;
+using System;
 
 namespace PixiEditor.Parser.Skia;
 
@@ -61,6 +62,11 @@ public static class SkiaExtensions
 
         foreach (SerializableLayer layer in document)
         {
+            if (layer.PngBytes == null || layer.PngBytes.Length == 0)
+            {
+                continue;
+            }
+
             bool visible = document.Layers.GetFinalLayerVisibilty(layer);
 
             if (!visible)
