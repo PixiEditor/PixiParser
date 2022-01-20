@@ -46,28 +46,16 @@ public class ParserTests
     }
 
     [Fact]
-    public void DetectOldFile()
-    {
-        Assert.Throws<OldFileFormatException>(() => PixiParser.Deserialize("./Files/OldPixiFile.pixi"));
-    }
+    public void DetectOldFile() => Assert.Throws<OldFileFormatException>(() => PixiParser.Deserialize("./Files/OldPixiFile.pixi"));
 
     [Fact]
-    public void DetectCorruptedFile()
-    {
-        Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./Files/CorruptedPixiFile.pixi"));
-    }
+    public void DetectCorruptedFile() => Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./Files/CorruptedPixiFile.pixi"));
 
     [Fact]
-    public void CanOpenExistingFile()
-    {
-        PixiParser.Deserialize("./Files/16x16,PPD-3.pixi");
-    }
+    public void CanOpenExistingFile() => PixiParser.Deserialize("./Files/16x16,PPD-3.pixi");
 
     [Fact]
-    public void IsBackwardsCompatible()
-    {
-        PixiParser.Deserialize("./Files/16x16,PE-0.6.pixi");
-    }
+    public void IsBackwardsCompatible() => PixiParser.Deserialize("./Files/16x16,PE-0.6.pixi");
 
     [Fact]
     public void LayerStructureWorks()
