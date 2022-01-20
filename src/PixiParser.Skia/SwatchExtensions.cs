@@ -25,11 +25,11 @@ public static class SwatchExtensions
     /// Adds the elements of the specified collection to the end of the <paramref name="collection"/>
     /// </summary>
     /// <return>The created <see cref="Color"/> instances</return>
-    public static IEnumerable<Color> AddRange(this SwatchCollection collection, IEnumerable<SKColor> colors)
+    public static void AddRange(this SwatchCollection collection, IEnumerable<SKColor> colors)
     {
         foreach (SKColor color in colors)
         {
-            yield return collection.Add(color);
+            collection.Add(color);
         }
     }
 
@@ -37,8 +37,6 @@ public static class SwatchExtensions
     /// Add's the <paramref name="color"/> to the <paramref name="collection"/> and returns the new <see cref="Color"/> instance
     /// </summary>
     /// <returns>The created <see cref="Color"/> instance</returns>
-    public static Color Add(this SwatchCollection collection, SKColor color)
-    {
-        return collection.Add(color.Alpha, color.Red, color.Green, color.Blue);
-    }
+    public static Color Add(this SwatchCollection collection, SKColor color) =>
+        collection.Add(color.Alpha, color.Red, color.Green, color.Blue);
 }
