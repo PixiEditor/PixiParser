@@ -70,11 +70,7 @@ public static partial class PixiParser
 
         byte[] buffer = new byte[8];
 
-#if NET5_0_OR_GREATER
-            stream.Read(buffer);
-#else
-        stream.Read(buffer, 0, 8);
-#endif
+        ReadBytesFromStream(stream, 8, buffer);
 
         stream.Position -= 22 + 8;
 
@@ -88,29 +84,36 @@ public static partial class PixiParser
     {
         byte[] lengthBytes = new byte[4];
 
-#if NET5_0_OR_GREATER
-            stream.Read(lengthBytes);
-            int length = BitConverter.ToInt32(lengthBytes);
-#else
-        stream.Read(lengthBytes, 0, 4);
+        ReadBytesFromStream(stream, 4, lengthBytes);
         int length = BitConverter.ToInt32(lengthBytes, 0);
-#endif
+
         byte[] buffer = new byte[length];
-
-#if NET5_0_OR_GREATER
-            int read = stream.Read(buffer);
-#else
-        int read = stream.Read(buffer, 0, buffer.Length);
-#endif
-
-        bytesRead = read + 4;
-
-        if (read != length)
+        try
         {
-            throw new InvalidFileException("Stream size did not match document size");
+            ReadBytesFromStream(stream, length, buffer);
+        }
+        catch (Exception e)
+        {
+            throw new InvalidFileException("Document size doesn't match stream size", e);
         }
 
+        bytesRead = length + 4;
+
         return buffer;
+    }
+
+    private static void ReadBytesFromStream(Stream stream, int count, byte[] buffer)
+    {
+        if (buffer.Length < count)
+            throw new ArgumentException($"The buffer is not big enough to read {count} bytes");
+        int read = 0;
+        while (read < count)
+        {
+            int newRead = stream.Read(buffer, read, count - read);
+            if (newRead == 0)
+                throw new Exception($"The stream doesn't contain {count} bytes");
+            read += newRead;
+        }
     }
 
     private static SerializableDocument ParseDocument(byte[] messagePack)
@@ -133,7 +136,7 @@ public static partial class PixiParser
         foreach (SerializableLayer layer in document)
         {
             byte[] layerLength = new byte[4];
-            stream.Read(layerLength, 0, 4);
+            ReadBytesFromStream(stream, 4, layerLength);
             int layerLengthI = BitConverter.ToInt32(layerLength, 0);
 
             if (layerLengthI == 0)
@@ -144,7 +147,7 @@ public static partial class PixiParser
             try
             {
                 layer.PngBytes = new byte[layerLengthI];
-                stream.Read(layer.PngBytes, 0, layerLengthI);
+                ReadBytesFromStream(stream, layerLengthI, layer.PngBytes);
             }
             catch (InvalidFileException)
             {
