@@ -11,6 +11,7 @@ namespace PixiEditor.Parser;
 public class SerializableDocument : IEnumerable<SerializableLayer>
 {
     private SwatchCollection swatchCollection;
+    private SwatchCollection palette;
     private LayerCollection layerCollection;
 
     /// <summary>
@@ -36,7 +37,7 @@ public class SerializableDocument : IEnumerable<SerializableLayer>
     /// </summary>
     [DataMember(Order = 2)]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used in message pack")]
-    private byte[] SwatchesData { get => GetSwatchesBytes(); set => Swatches.FromByteArray(value); }
+    private byte[] SwatchesData { get => GetSwatchesBytes(palette); set => Swatches.FromByteArray(value); }
 
     /// <summary>
     /// A collection of swatches used in the document
@@ -100,6 +101,31 @@ public class SerializableDocument : IEnumerable<SerializableLayer>
     public List<SerializableGroup> Groups { get; set; }
 
     /// <summary>
+    /// A byte array containing all the swatches
+    /// </summary>
+    [DataMember(Order = 6)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used in message pack")]
+    private byte[] PaletteData { get => GetSwatchesBytes(Palette); set => Palette.FromByteArray(value); }
+
+    /// <summary>
+    /// A collection of colors used in the document palette
+    /// </summary>
+    [IgnoreDataMember]
+    public SwatchCollection Palette
+    {
+        get
+        {
+            if (palette == null)
+            {
+                return palette = new SwatchCollection();
+            }
+
+            return palette;
+        }
+        internal set => palette = value;
+    }
+
+    /// <summary>
     /// Creates a new empty document
     /// </summary>
     public SerializableDocument()
@@ -160,7 +186,7 @@ public class SerializableDocument : IEnumerable<SerializableLayer>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(FileVersion, Width, Height, swatchCollection, layerCollection, Groups);
+        return HashCode.Combine(FileVersion, Width, Height, swatchCollection, palette, layerCollection, Groups);
     }
 
     public override bool Equals(object obj)
@@ -178,16 +204,17 @@ public class SerializableDocument : IEnumerable<SerializableLayer>
         return FileVersion == document.FileVersion && Width == document.Width && Height == document.Height &&
                (swatchCollection == null && document.swatchCollection == null || swatchCollection.SequenceEqual(document.swatchCollection)) &&
                (layerCollection == null && document.layerCollection == null || layerCollection.SequenceEqual(document.layerCollection)) &&
-               (Groups == null && document.Groups == null || Groups.SequenceEqual(document.Groups));
+               (Groups == null && document.Groups == null || Groups.SequenceEqual(document.Groups)
+               && (palette == null && document.palette == null || palette.SequenceEqual(document.palette)));
     }
 
-    private byte[] GetSwatchesBytes()
+    private byte[] GetSwatchesBytes(SwatchCollection collection)
     {
-        if (Swatches is null)
+        if (collection is null)
         {
             return Array.Empty<byte>();
         }
 
-        return Swatches.ToByteArray();
+        return collection.ToByteArray();
     }
 }
