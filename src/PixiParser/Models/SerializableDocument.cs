@@ -37,7 +37,7 @@ public class SerializableDocument : IEnumerable<SerializableLayer>
     /// </summary>
     [DataMember(Order = 2)]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used in message pack")]
-    private byte[] SwatchesData { get => GetSwatchesBytes(palette); set => Swatches.FromByteArray(value); }
+    private byte[] SwatchesData { get => GetSwatchesBytes(swatchCollection); set => Swatches.FromByteArray(value); }
 
     /// <summary>
     /// A collection of swatches used in the document
