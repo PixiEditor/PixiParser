@@ -6,7 +6,7 @@
     <RootNamespace>PixiEditor.Parser</RootNamespace>
     <PackageId>PixiEditor.Parser</PackageId>
     <Company>PixiEditor</Company>
-    <Authors>CPK, Krzysztof Krysiński</Authors>
+    <Authors>Philip Kreuz, Krzysztof Krysiński, Egor Mozgovoy and Contributors</Authors>
     <Description>A Parser for serializing and deserializing .pixi files used by PixiEditor</Description>
     <Copyright>PixiEditor ©</Copyright>
     <RepositoryUrl>https://github.com/PixiEditor/PixiParser</RepositoryUrl>
@@ -16,6 +16,7 @@
     <PackageIcon>PixiParserLogo.png</PackageIcon>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <Version>2.1.0.2</Version>
+    <PackageVersion>2.1.0.3</PackageVersion>
   </PropertyGroup>
 
 	<ItemGroup>
