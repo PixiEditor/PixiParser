@@ -37,7 +37,17 @@ public class SerializableDocument : IEnumerable<SerializableLayer>
     /// </summary>
     [DataMember(Order = 2)]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used in message pack")]
-    private byte[] SwatchesData { get => GetSwatchesBytes(swatchCollection); set => Swatches.FromByteArray(value); }
+    private byte[] SwatchesData
+    { 
+        get => GetSwatchesBytes(swatchCollection); 
+        set
+        {
+            if (value != null)
+            {
+                Swatches.FromByteArray(value);
+            }
+        }
+    }
 
     /// <summary>
     /// A collection of swatches used in the document
@@ -105,7 +115,17 @@ public class SerializableDocument : IEnumerable<SerializableLayer>
     /// </summary>
     [DataMember(Order = 6)]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used in message pack")]
-    private byte[] PaletteData { get => GetSwatchesBytes(Palette); set => Palette.FromByteArray(value); }
+    private byte[] PaletteData
+    { 
+        get => GetSwatchesBytes(Palette); 
+        set
+        {
+            if (value != null)
+            {
+                Palette.FromByteArray(value);
+            }
+        }
+    }
 
     /// <summary>
     /// A collection of colors used in the document palette
