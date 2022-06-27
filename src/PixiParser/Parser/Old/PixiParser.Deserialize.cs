@@ -3,9 +3,9 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace PixiEditor.Parser;
+namespace PixiEditor.Parser.Old;
 
-public static partial class PixiParser
+internal static class PixiParser
 {
     static readonly byte[] oldFormatIdentifier =
         new byte[] { 0x41, 0x50, 0x69, 0x78, 0x69, 0x45, 0x64, 0x69 };

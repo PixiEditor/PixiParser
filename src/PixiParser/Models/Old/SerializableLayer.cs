@@ -3,11 +3,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace PixiEditor.Parser;
+namespace PixiEditor.Parser.Old;
 
 [DataContract]
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public class SerializableLayer
+internal class SerializableLayer
 {
     private float opacity;
 

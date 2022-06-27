@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using static System.Math;
 
-namespace PixiEditor.Parser.Helpers;
+namespace PixiEditor.Parser.Helpers.Old;
 
 internal static class StructureHelpers
 {

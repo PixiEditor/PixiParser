@@ -1,13 +1,14 @@
 ﻿using PixiEditor.Parser.Helpers;
+using PixiEditor.Parser.Old;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace PixiEditor.Parser.Collections;
+namespace PixiEditor.Parser.Collections.Old;
 
 [DebuggerDisplay("Count = {Count}")]
-public class LayerCollection : IList<SerializableLayer>
+internal class LayerCollection : IList<SerializableLayer>
 {
     private readonly SerializableDocument _document;
     private readonly List<SerializableLayer> _layers;

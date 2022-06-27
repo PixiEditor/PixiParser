@@ -1,4 +1,4 @@
-﻿namespace PixiEditor.Parser.Helpers;
+﻿namespace PixiEditor.Parser.Helpers.Old;
 
 public static class LayerHelpers
 {
