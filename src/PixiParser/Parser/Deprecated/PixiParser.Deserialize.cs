@@ -3,9 +3,12 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace PixiEditor.Parser.Old;
+namespace PixiEditor.Parser.Deprecated;
 
-internal static class PixiParser
+/// <summary>
+/// Use this class to parse pre 4.0 files.
+/// </summary>
+public static class DepractedPixiParser
 {
     static readonly byte[] oldFormatIdentifier =
         new byte[] { 0x41, 0x50, 0x69, 0x78, 0x69, 0x45, 0x64, 0x69 };

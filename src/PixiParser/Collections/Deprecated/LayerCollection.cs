@@ -1,14 +1,14 @@
-﻿using PixiEditor.Parser.Helpers;
-using PixiEditor.Parser.Old;
+﻿using PixiEditor.Parser.Deprecated;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using PixiEditor.Parser.Helpers.Deprecated;
 
-namespace PixiEditor.Parser.Collections.Old;
+namespace PixiEditor.Parser.Collections.Deprecated;
 
 [DebuggerDisplay("Count = {Count}")]
-internal class LayerCollection : IList<SerializableLayer>
+public class LayerCollection : IList<SerializableLayer>
 {
     private readonly SerializableDocument _document;
     private readonly List<SerializableLayer> _layers;

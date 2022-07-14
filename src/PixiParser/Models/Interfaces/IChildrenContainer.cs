@@ -5,7 +5,7 @@ namespace PixiEditor.Parser;
 /// <summary>
 /// A structure member containing other structure members
 /// </summary>
-public interface IChildrenContainer : IStructureMember, IList<IStructureMember>
+public interface IChildrenContainer : IStructureMember
 {
-    public void AddRange(IEnumerable<IStructureMember> children);
+    public List<IStructureMember> Children { get; }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace PixiEditor.Parser.Collections.Old;
+namespace PixiEditor.Parser.Collections.Deprecated;
 
 public class SwatchCollection : List<Color>
 {

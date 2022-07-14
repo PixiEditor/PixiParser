@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace PixiEditor.Parser.Old;
+namespace PixiEditor.Parser.Deprecated;
 
 [DataContract]
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-internal class SerializableGroup
+public class SerializableGroup
 {
     /// <summary>
     /// The name of the group

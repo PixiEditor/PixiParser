@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using PixiEditor.Parser.Deprecated;
 using static System.Math;
 
-namespace PixiEditor.Parser.Helpers.Old;
+namespace PixiEditor.Parser.Helpers.Deprecated;
 
 internal static class StructureHelpers
 {

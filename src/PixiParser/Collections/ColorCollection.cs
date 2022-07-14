@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using MessagePack;
 
 namespace PixiEditor.Parser.Collections;
 
+[MessagePackObject]
 public class ColorCollection : List<Color>
 {
     /// <summary>
@@ -89,6 +91,29 @@ public class ColorCollection : List<Color>
     {
         Add(color);
         return color;
+    }
+
+    internal byte[] ToByteArray()
+    {
+        if (Count == 0)
+        {
+            return Array.Empty<byte>();
+        }
+
+        byte[] array = new byte[Count * 4];
+
+        for (int i = 0; i < Count; i++)
+        {
+            int arrayIndex = i * 4;
+            Color swatch = this[i];
+
+            array[arrayIndex] = swatch.A;
+            array[arrayIndex + 1] = swatch.R;
+            array[arrayIndex + 2] = swatch.G;
+            array[arrayIndex + 3] = swatch.B;
+        }
+
+        return array;
     }
 
     internal void FromByteArray(byte[] bytes)

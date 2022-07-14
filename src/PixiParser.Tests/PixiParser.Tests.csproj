@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PixiParser.Skia\PixiParser.Skia.csproj" />
+<!--    <ProjectReference Include="..\PixiParser.Skia\PixiParser.Skia.csproj" />-->
     <ProjectReference Include="..\PixiParser\PixiParser.csproj" />
   </ItemGroup>
 

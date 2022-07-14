@@ -1,14 +1,14 @@
-﻿namespace PixiEditor.Parser;
+﻿using MessagePack;
 
+namespace PixiEditor.Parser;
+
+[Union(0, typeof(Folder))]
+[Union(1, typeof(ImageLayer))]
+[Union(2, typeof(ReferenceLayer))]
 public interface IStructureMember
 {
     /// <summary>
     /// Is this structure member enabled/visible
     /// </summary>
     public bool Enabled { get; set; }
-    
-    /// <summary>
-    /// The opacity of this structure member. Must be a value between 0 and 1. Initial value is 1
-    /// </summary>
-    public float Opacity { get; set; }
 }

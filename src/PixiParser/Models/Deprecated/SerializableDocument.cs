@@ -1,15 +1,14 @@
-﻿using PixiEditor.Parser.Collections.Old;
-using PixiEditor.Parser.Collections;
+﻿using PixiEditor.Parser.Collections.Deprecated;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace PixiEditor.Parser.Old;
+namespace PixiEditor.Parser.Deprecated;
 
 [DataContract]
-internal class SerializableDocument : IEnumerable<SerializableLayer>
+public class SerializableDocument : IEnumerable<SerializableLayer>
 {
     private SwatchCollection swatchCollection;
     private SwatchCollection palette;

@@ -5,8 +5,5 @@
 /// </summary>
 public interface IMaskable : IStructureMember
 {
-    /// <summary>
-    /// A byte array containing the bytes for the mask png
-    /// </summary>
-    public byte[] MaskBytes { get; set; }
+    public Mask Mask { get; set; }
 }
