@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using PixiEditor.Parser.Deprecated;
 using PixiEditor.Parser.Helpers;
 using Xunit;
@@ -12,6 +13,41 @@ public class ParserTests
 {
     [Fact]
     public void SerializingAndDeserialzingWorks()
+    {
+        var document = GetFullDocument();
+        
+        using FileStream stream = new("test.pixi", FileMode.Create);
+        PixiParser.Serialize(stream, document);
+
+        stream.Position = 0;
+        
+        var deserializedDocument = PixiParser.Deserialize(stream);
+        
+        AssertEqual(document, deserializedDocument);
+    }
+    
+    [Fact]
+    public async Task SerializingAndDeserialzingWorksAsync()
+    {
+        var document = GetFullDocument();
+
+        await using FileStream stream = new("testAsync.pixi", FileMode.Create);
+        await PixiParser.SerializeAsync(stream, document);
+
+        stream.Position = 0;
+        
+        var deserializedDocument = await PixiParser.DeserializeAsync(stream);
+        
+        AssertEqual(document, deserializedDocument);
+    }
+
+    [Fact]
+    public void DetectOldFile() => Assert.Throws<OldFileFormatException>(() => DepractedPixiParser.Deserialize("./Files/OldPixiFile.pixi"));
+
+    [Fact]
+    public void DetectCorruptedFile() => Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./Files/CorruptedPixiFile.pixi"));
+
+    private static Document GetFullDocument()
     {
         Document document = new()
         {
@@ -66,22 +102,9 @@ public class ParserTests
             }
         });
 
-        using FileStream stream = new("test.pixi", FileMode.Create);
-        PixiParser.Serialize(stream, document);
-
-        stream.Position = 0;
-        
-        var deserializedDocument = PixiParser.Deserialize(stream);
-        
-        AssertEqual(document, deserializedDocument);
+        return document;
     }
-
-    [Fact]
-    public void DetectOldFile() => Assert.Throws<OldFileFormatException>(() => DepractedPixiParser.Deserialize("./Files/OldPixiFile.pixi"));
-
-    [Fact]
-    public void DetectCorruptedFile() => Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./Files/CorruptedPixiFile.pixi"));
-
+    
     private static void AssertEqual(Document expectedDocument, Document actualDocument)
     {
         Assert.Equal(expectedDocument.Version, actualDocument.Version);

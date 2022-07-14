@@ -3,28 +3,43 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using MessagePack;
-using MessagePack.Resolvers;
 using PixiEditor.Parser.Helpers;
 
 namespace PixiEditor.Parser;
 
 public partial class PixiParser
 {
-    public static void Serialize(Stream stream, Document document, CancellationToken cancellationToken = default)
+    public static byte[] Serialize(Document document, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        using var stream = new MemoryStream();
+        Serialize(stream, document, cancellationToken);
+        return stream.ToArray();
+    }
+
+    public static async Task SerializeAsync(string path, Document document, CancellationToken cancellationToken = default)
+    {
+        #if NET5_0_OR_GREATER
+        await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+        #else
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+        #endif
+        await SerializeAsync(stream, document, cancellationToken).ConfigureAwait(false);
+    }
+    
+    public static async Task SerializeAsync(Stream stream, Document document, CancellationToken cancellationToken = default)
+    {
+        document.Version = FileVersion;
+        document.MinVersion = MinSupportedVersion;
         
-        stream.Write(Magic, 0, Magic.Length);
+        byte[] header = GetHeader();
         
-        cancellationToken.ThrowIfCancellationRequested();
-        
-        byte[] version = new byte[HeaderLength - MagicLength];
-        
-        WriteVersion(version, FileVersion, 0);
-        WriteVersion(version, MinSupportedVersion, 8);
-        
-        stream.Write(version, 0, version.Length);
+        #if NET5_0_OR_GREATER
+        await stream.WriteAsync(header, cancellationToken).ConfigureAwait(false);
+        #else
+        await stream.WriteAsync(header, 0, header.Length, cancellationToken).ConfigureAwait(false);
+        #endif
         
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -32,10 +47,7 @@ public partial class PixiParser
         {
             throw new ArgumentException($"Header length did not match the constant '{nameof(HeaderLength)}'");
         }
-        
-        int resourceOffset = 0;
 
-        List<IImageContainer> resources = new(document.RootFolder.Children.Count + 1);
         var members = document.RootFolder.GetChildrenRecursive().ToList();
         
         if (document.ReferenceLayer != null)
@@ -43,6 +55,71 @@ public partial class PixiParser
             members.Add(document.ReferenceLayer);
         }
 
+        var resources = GetResources(members, cancellationToken);
+
+        await MessagePackSerializer.SerializeAsync(stream,document, MessagePackOptions, cancellationToken).ConfigureAwait(false);
+
+        foreach (var resource in resources)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            #if NET5_0_OR_GREATER
+            await stream.WriteAsync(resource.ImageBytes.AsMemory(0, resource.ImageBytes.Length), cancellationToken).ConfigureAwait(false);
+            #else
+            await stream.WriteAsync(resource.ImageBytes, 0, resource.ImageBytes.Length, cancellationToken).ConfigureAwait(false);
+            #endif
+        }
+    }
+
+    public static void Serialize(Stream stream, Document document, CancellationToken cancellationToken = default)
+    {
+        document.Version = FileVersion;
+        document.MinVersion = MinSupportedVersion;
+        
+        byte[] header = GetHeader();
+        stream.Write(header, 0, header.Length);
+        
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (stream.Position != HeaderLength)
+        {
+            throw new ArgumentException($"Header length did not match the constant '{nameof(HeaderLength)}'");
+        }
+
+        var members = document.RootFolder.GetChildrenRecursive().ToList();
+        
+        if (document.ReferenceLayer != null)
+        {
+            members.Add(document.ReferenceLayer);
+        }
+
+        var resources = GetResources(members, cancellationToken);
+
+        var msg = MessagePackSerializer.Serialize(document, MessagePackOptions, cancellationToken);
+        stream.Write(msg, 0, msg.Length);
+
+        foreach (var resource in resources)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            stream.Write(resource.ImageBytes, 0, resource.ImageBytes.Length);
+        }
+    }
+
+    private static byte[] GetHeader()
+    {
+        byte[] header = new byte[HeaderLength];
+        Magic.CopyTo(header, 0);
+        
+        WriteVersion(header, FileVersion, MagicLength);
+        WriteVersion(header, MinSupportedVersion, MagicLength + 8);
+
+        return header;
+    }
+
+    private static List<IImageContainer> GetResources(IEnumerable<IStructureMember> members, CancellationToken cancellationToken = default)
+    {
+        int resourceOffset = 0;
+        List<IImageContainer> resources = new(members.Count() + 1);
+        
         foreach (var member in members)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -68,14 +145,8 @@ public partial class PixiParser
                 resources.Add(maskImage);
             }
         }
-        
-        var msg = MessagePackSerializer.Serialize(document, MessagePackOptions, cancellationToken);
-        stream.Write(msg, 0, msg.Length);
 
-        foreach (var resource in resources)
-        {
-            stream.Write(resource.ImageBytes, 0, resource.ImageBytes.Length);
-        }
+        return resources;
     }
 
     private static void WriteVersion(byte[] buffer, Version version, int offset)

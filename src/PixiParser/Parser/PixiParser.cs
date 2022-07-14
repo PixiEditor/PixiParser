@@ -6,9 +6,9 @@ namespace PixiEditor.Parser;
 
 public static partial class PixiParser
 {
-    public static Version FileVersion { get; } = new(4, 0, 0, 0);
+    public static Version FileVersion { get; } = new(4, 0);
     
-    public static Version MinSupportedVersion { get; } = new(4, 0, 0, 0);
+    public static Version MinSupportedVersion { get; } = new(4, 0);
 
     private static MessagePackSerializerOptions MessagePackOptions { get; } = MessagePackSerializerOptions.Standard
         .WithSecurity(MessagePackSecurity.UntrustedData)
