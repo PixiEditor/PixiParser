@@ -6,7 +6,7 @@ namespace PixiEditor.Parser;
 
 [MessagePackObject]
 [DebuggerDisplay("'{Name, nq}' {Width}x{Height}")]
-public sealed class ImageLayer : IImageContainer, IName, IMaskable, ISize<int>
+public sealed class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, ISize<int>
 {
     [IgnoreMember]
     private float _opacity = 1;
@@ -31,20 +31,23 @@ public sealed class ImageLayer : IImageContainer, IName, IMaskable, ISize<int>
 
     [IgnoreMember]
     public byte[] ImageBytes { get; set; }
-    
+
     [Key(6)]
-    public Mask Mask { get; set; }
+    public BlendMode BlendMode { get; set; }
 
     [Key(7)]
+    public Mask Mask { get; set; }
+
+    [Key(8)]
     public float Opacity
     {
         get => _opacity;
         set => this.SetOpacity(ref _opacity, value);
     }
     
-    [Key(8)]
+    [Key(9)]
     int IImageContainer.ResourceOffset { get; set; }
 
-    [Key(9)]
+    [Key(10)]
     int IImageContainer.ResourceSize { get; set; }
 }

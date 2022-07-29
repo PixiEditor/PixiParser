@@ -40,13 +40,33 @@ public partial class PixiParser
         #else
         await stream.WriteAsync(header, 0, header.Length, cancellationToken).ConfigureAwait(false);
         #endif
-        
-        cancellationToken.ThrowIfCancellationRequested();
 
         if (stream.Position != HeaderLength)
         {
-            throw new ArgumentException($"Header length did not match the constant '{nameof(HeaderLength)}'");
+            throw new ArgumentException($"Expected header length of {HeaderLength} but got {stream.Position}");
         }
+
+        if (document.PreviewImage != null && document.PreviewImage.Length != 0)
+        {
+            byte[] preview = document.PreviewImage;
+            int previewLength = preview.Length;
+
+            #if NET5_0_OR_GREATER
+            await stream.WriteAsync(BitConverter.GetBytes(previewLength), cancellationToken).ConfigureAwait(false);
+            await stream.WriteAsync(preview, cancellationToken).ConfigureAwait(false);
+            #else
+            await stream.WriteAsync(BitConverter.GetBytes(previewLength), 0, sizeof(int), cancellationToken)
+                .ConfigureAwait(false);
+            await stream.WriteAsync(preview, 0, previewLength, cancellationToken).ConfigureAwait(false);
+            #endif
+        }
+        else
+        {
+            await stream.WriteAsync(new byte[4], 0, 4, cancellationToken).ConfigureAwait(false);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+
 
         var members = document.RootFolder.GetChildrenRecursive().ToList();
         
@@ -77,13 +97,30 @@ public partial class PixiParser
         
         byte[] header = GetHeader();
         stream.Write(header, 0, header.Length);
-        
-        cancellationToken.ThrowIfCancellationRequested();
 
         if (stream.Position != HeaderLength)
         {
-            throw new ArgumentException($"Header length did not match the constant '{nameof(HeaderLength)}'");
+            throw new ArgumentException($"Expected header length of {HeaderLength} but got {stream.Position}");
         }
+
+        if (document.PreviewImage != null && document.PreviewImage.Length != 0)
+        {
+            byte[] preview = document.PreviewImage;
+            
+            #if NET5_0_OR_GREATER
+            stream.Write(BitConverter.GetBytes(preview.Length));
+            stream.Write(preview);
+            #else
+            stream.Write(BitConverter.GetBytes(preview.Length), 0, sizeof(int));
+            stream.Write(preview, 0, preview.Length);
+            #endif
+        }
+        else
+        {
+            stream.Write(new byte[4], 0, 4);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         var members = document.RootFolder.GetChildrenRecursive().ToList();
         

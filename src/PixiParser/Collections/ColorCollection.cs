@@ -5,7 +5,6 @@ using MessagePack;
 
 namespace PixiEditor.Parser.Collections;
 
-[MessagePackObject]
 public class ColorCollection : List<Color>
 {
     /// <summary>

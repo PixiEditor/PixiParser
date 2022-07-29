@@ -26,8 +26,11 @@ public sealed class Mask : IImageContainer, ISize<int>
     public byte[] ImageBytes { get; set; }
 
     [Key(5)]
+    public BlendMode BlendMode { get; set; }
+
+    [Key(6)]
     int IImageContainer.ResourceOffset { get; set; }
     
-    [Key(6)]
+    [Key(7)]
     int IImageContainer.ResourceSize { get; set; }
 }

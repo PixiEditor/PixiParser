@@ -11,6 +11,6 @@ public interface IImageContainer : IStructureMember
     public byte[] ImageBytes { get; set; }
     
     internal int ResourceOffset { get; set; }
-    
+
     internal int ResourceSize { get; set; }
 }

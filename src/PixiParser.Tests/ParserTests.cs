@@ -63,6 +63,14 @@ public class ParserTests
         document.Palette.Add(0, 254, 153, 80);
         document.Palette.Add(254, 153, 80);
 
+        document.PreviewImage = new byte[]
+        {
+            0x42,
+            0x21,
+            0x64,
+            0xAC
+        };
+
         document.ReferenceLayer = new ReferenceLayer()
         {
             Width = 2,
@@ -112,7 +120,16 @@ public class ParserTests
         Assert.Equal(expectedDocument.Width, actualDocument.Width);
         Assert.Equal(expectedDocument.Swatches.Count, actualDocument.Swatches.Count);
         Assert.Equal(expectedDocument.RootFolder.GetChildrenRecursive().Count(), actualDocument.RootFolder.GetChildrenRecursive().Count());
-        
+
+        if (expectedDocument.PreviewImage == null)
+        {
+            Assert.Empty(actualDocument.PreviewImage);
+        }
+        else
+        {
+            Assert.True(expectedDocument.PreviewImage.SequenceEqual(actualDocument.PreviewImage));
+        }
+
         AssertMember(expectedDocument.ReferenceLayer, actualDocument.ReferenceLayer);
 
         for (int i = 0; i < expectedDocument.Swatches.Count; i++)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,6 +46,8 @@ public partial class PixiParser
 
         var version = ValidateHeader(bytesRead, header);
 
+        byte[] preview = ReadPreview(stream);
+        
         Document document;
 
         try
@@ -60,6 +63,8 @@ public partial class PixiParser
         
         document.Version = version.version;
         document.MinVersion = version.minVersion;
+        
+        document.PreviewImage = preview;
 
         var members = document.RootFolder.GetChildrenRecursive().ToList();
         
@@ -134,6 +139,8 @@ public partial class PixiParser
             };
         }
 
+        byte[] preview = await ReadPreviewAsync(stream, cancellationToken).ConfigureAwait(false);
+
         Document document;
 
         try
@@ -149,6 +156,8 @@ public partial class PixiParser
 
         document.Version = version.version;
         document.MinVersion = version.minVersion;
+
+        document.PreviewImage = preview;
         
         var members = document.RootFolder.GetChildrenRecursive().ToList();
         
@@ -215,7 +224,7 @@ public partial class PixiParser
     {
         if (bytesRead != HeaderLength)
         {
-            throw new InvalidFileException("Header was not of expected length");
+            throw new InvalidFileException($"Header was not of expected length. Expected {HeaderLength} bytes, but got {bytesRead} bytes.");
         }
         
         if (!header.Slice(0, MagicLength).SequenceEqual(Magic))
@@ -253,4 +262,59 @@ public partial class PixiParser
     {
         Document = document
     };
+
+    private static byte[] ReadPreview(Stream stream)
+    {
+        byte[] previewLengthBytes = new byte[4];
+        int bytesRead = stream.Read(previewLengthBytes, 0, 4);
+
+        if (bytesRead != 4)
+        {
+            throw new InvalidFileException();
+        }
+        
+        byte[] previewData = new byte[BitConverter.ToInt32(previewLengthBytes, 0)];
+
+        int left = previewData.Length;
+        
+        do
+        {
+            bytesRead = stream.Read(previewData, 0, previewData.Length);
+            left -= bytesRead;
+        } while (bytesRead != 0 && left != 0);
+
+        if (left != 0)
+        {
+            throw new InvalidFileException("Reached end of stream while reading preview");
+        }
+        
+        return previewData;
+    }
+
+    private static async Task<byte[]> ReadPreviewAsync(Stream stream, CancellationToken cancellationToken)
+    {
+        byte[] previewLengthBytes = new byte[4];
+        int bytesRead = await stream.ReadAsync(previewLengthBytes, 0, 4, cancellationToken).ConfigureAwait(false);
+
+        if (bytesRead != 4)
+        {
+            throw new InvalidFileException("Reached end of stream while reading preview length");
+        }
+        
+        byte[] previewData = new byte[BitConverter.ToInt32(previewLengthBytes, 0)];
+        int left = previewData.Length;
+        
+        do
+        {
+            bytesRead = await stream.ReadAsync(previewData, 0, previewData.Length, cancellationToken).ConfigureAwait(false);
+            left -= bytesRead;
+        } while (bytesRead != 0 && left != 0);
+        
+        if (left != 0)
+        {
+            throw new InvalidFileException("Reached end of stream while reading preview");
+        }
+
+        return previewData;
+    }
 }

@@ -31,6 +31,9 @@ public sealed class Document
     [IgnoreMember]
     public Version MinVersion { get; internal set; }
     
+    [IgnoreMember]
+    public byte[] PreviewImage { get; set; }
+    
     /// <summary>
     /// The width of the doucment
     /// </summary>
