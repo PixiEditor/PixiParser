@@ -11,24 +11,30 @@ namespace PixiEditor.Parser;
 
 public partial class PixiParser
 {
+    public static void Serialize(Document document, string path, CancellationToken cancellationToken = default)
+    {
+        using var stream = File.OpenWrite(path);
+        Serialize(document, stream, cancellationToken);
+    }
+
     public static byte[] Serialize(Document document, CancellationToken cancellationToken = default)
     {
         using var stream = new MemoryStream();
-        Serialize(stream, document, cancellationToken);
+        Serialize(document, stream, cancellationToken);
         return stream.ToArray();
     }
 
-    public static async Task SerializeAsync(string path, Document document, CancellationToken cancellationToken = default)
+    public static async Task SerializeAsync(Document document, string path, CancellationToken cancellationToken = default)
     {
         #if NET5_0_OR_GREATER
         await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
         #else
         using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
         #endif
-        await SerializeAsync(stream, document, cancellationToken).ConfigureAwait(false);
+        await SerializeAsync(document, stream, cancellationToken).ConfigureAwait(false);
     }
     
-    public static async Task SerializeAsync(Stream stream, Document document, CancellationToken cancellationToken = default)
+    public static async Task SerializeAsync(Document document, Stream stream, CancellationToken cancellationToken = default)
     {
         document.Version = FileVersion;
         document.MinVersion = MinSupportedVersion;
@@ -68,7 +74,7 @@ public partial class PixiParser
         cancellationToken.ThrowIfCancellationRequested();
 
 
-        var members = document.RootFolder.GetChildrenRecursive().ToList();
+        var members = document.RootFolder?.GetChildrenRecursive().ToList() ?? new List<IStructureMember>();
         
         if (document.ReferenceLayer != null)
         {
@@ -90,7 +96,7 @@ public partial class PixiParser
         }
     }
 
-    public static void Serialize(Stream stream, Document document, CancellationToken cancellationToken = default)
+    public static void Serialize(Document document, Stream stream, CancellationToken cancellationToken = default)
     {
         document.Version = FileVersion;
         document.MinVersion = MinSupportedVersion;
@@ -122,7 +128,7 @@ public partial class PixiParser
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var members = document.RootFolder.GetChildrenRecursive().ToList();
+        var members = document.RootFolder?.GetChildrenRecursive().ToList() ?? new List<IStructureMember>();
         
         if (document.ReferenceLayer != null)
         {

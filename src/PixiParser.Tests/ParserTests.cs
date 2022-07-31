@@ -17,7 +17,7 @@ public class ParserTests
         var document = GetFullDocument();
         
         using FileStream stream = new("test.pixi", FileMode.Create);
-        PixiParser.Serialize(stream, document);
+        PixiParser.Serialize(document, stream);
 
         stream.Position = 0;
         
@@ -32,7 +32,7 @@ public class ParserTests
         var document = GetFullDocument();
 
         await using FileStream stream = new("testAsync.pixi", FileMode.Create);
-        await PixiParser.SerializeAsync(stream, document);
+        await PixiParser.SerializeAsync(document, stream);
 
         stream.Position = 0;
         

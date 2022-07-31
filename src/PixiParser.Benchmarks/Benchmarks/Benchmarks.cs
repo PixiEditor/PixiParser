@@ -8,17 +8,17 @@ namespace PixiEditor.Parser.Benchmarks;
 [MarkdownExporterAttribute.GitHub]
 public partial class Benchmarks
 {
-    [Params(64, 1920)]
+    [Params(1920)]
     public int Size;
 
-    [Params(1, 4)]
+    [Params(4)]
     public int Layers;
 
     [GlobalSetup]
     public void Setup()
     {
-        benchmarkDocumentBytes = PixiParser.Serialize(Helper.CreateDocument(Size, Layers));
         benchmarkDocument = Helper.CreateDocument(Size, Layers);
+        benchmarkDocumentBytes = PixiParser.Serialize(benchmarkDocument);
 
         bitmaps = new SkiaSharp.SKBitmap[Layers];
 
@@ -26,5 +26,7 @@ public partial class Benchmarks
         {
             bitmaps[i] = Helper.CreateSKBitmap(Size);
         }
+
+        PixiParser.Serialize(benchmarkDocument, "./test.pixi");
     }
 }

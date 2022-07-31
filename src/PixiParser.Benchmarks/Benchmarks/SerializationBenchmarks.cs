@@ -5,7 +5,7 @@ namespace PixiEditor.Parser.Benchmarks;
 
 public partial class Benchmarks
 {
-    private SerializableDocument benchmarkDocument;
+    private Document benchmarkDocument;
     private SKBitmap[] bitmaps;
 
     [Benchmark]
@@ -17,14 +17,14 @@ public partial class Benchmarks
     [Benchmark]
     public byte[] SerializeAndCreate()
     {
-        SerializableDocument document = Helper.CreateDocument(Size, Layers, false);
+        Document document = Helper.CreateDocument(Size, Layers, false);
 
         for (int i = 0; i < Layers; i++)
         {
             SKData encoded = bitmaps[i].Encode(SKEncodedImageFormat.Png, 100);
-            document.Layers[i].PngBytes = encoded.AsSpan().ToArray();
+            ((IImageContainer)document.RootFolder.Children[i]).ImageBytes = encoded.AsSpan().ToArray();
         }
-
+        
         return PixiParser.Serialize(benchmarkDocument);
     }
 }
