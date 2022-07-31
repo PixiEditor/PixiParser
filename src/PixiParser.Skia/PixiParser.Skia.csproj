@@ -19,6 +19,7 @@
     <PackageIcon>PixiParserLogo.png</PackageIcon>
     <Version>2.0.0.1</Version>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageVersion>3.0.0.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
