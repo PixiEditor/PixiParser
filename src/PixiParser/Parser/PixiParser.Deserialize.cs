@@ -44,9 +44,9 @@ public partial class PixiParser
         
         cancellationToken.ThrowIfCancellationRequested();
 
-        var version = ValidateHeader(bytesRead, header);
+        var version = ValidateHeader(bytesRead, header)!.Value;
 
-        byte[] preview = ReadPreview(stream);
+        byte[] preview = ReadPreview(stream, false);
         
         Document document;
 
@@ -128,7 +128,7 @@ public partial class PixiParser
         var bytesRead = await stream.ReadAsync(header, 0, HeaderLength, cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var version = ValidateHeader(bytesRead, header);
+        var version = ValidateHeader(bytesRead, header)!.Value;
         
         if (FileVersion < version.minVersion)
         {
@@ -139,7 +139,7 @@ public partial class PixiParser
             };
         }
 
-        byte[] preview = await ReadPreviewAsync(stream, cancellationToken).ConfigureAwait(false);
+        byte[] preview = await ReadPreviewAsync(stream, cancellationToken, false).ConfigureAwait(false);
 
         Document document;
 
@@ -220,7 +220,7 @@ public partial class PixiParser
         return document;
     }
     
-    private static (Version version, Version minVersion) ValidateHeader(int bytesRead, ReadOnlySpan<byte> header)
+    private static (Version version, Version minVersion)? ValidateHeader(int bytesRead, ReadOnlySpan<byte> header, bool skipVersion = false)
     {
         if (bytesRead != HeaderLength)
         {
@@ -230,6 +230,11 @@ public partial class PixiParser
         if (!header.Slice(0, MagicLength).SequenceEqual(Magic))
         {
             throw new InvalidFileException("Header did not start with expected magic");
+        }
+        
+        if (skipVersion)
+        {
+            return null;
         }
         
         return (ReadVersion(header.Slice(HeaderLength - 16, 8)), ReadVersion(header.Slice(HeaderLength - 8, 8)));
@@ -263,10 +268,23 @@ public partial class PixiParser
         Document = document
     };
 
-    private static byte[] ReadPreview(Stream stream)
+    public static byte[] ReadPreview(Stream stream) => ReadPreview(stream, true);
+
+    private static byte[] ReadPreview(Stream stream, bool checkHeader)
     {
+        int bytesRead;
+
+        if (checkHeader)
+        {
+            var header = new byte[HeaderLength];
+        
+            bytesRead = stream.Read(header, 0, HeaderLength);
+            
+            _ = ValidateHeader(bytesRead, header);
+        }
+        
         byte[] previewLengthBytes = new byte[4];
-        int bytesRead = stream.Read(previewLengthBytes, 0, 4);
+        bytesRead = stream.Read(previewLengthBytes, 0, 4);
 
         if (bytesRead != 4)
         {
@@ -291,10 +309,24 @@ public partial class PixiParser
         return previewData;
     }
 
-    private static async Task<byte[]> ReadPreviewAsync(Stream stream, CancellationToken cancellationToken)
+    public static Task<byte[]> ReadPreviewAsync(Stream stream, CancellationToken cancellationToken = default) => ReadPreviewAsync(stream, cancellationToken, true);
+    
+    private static async Task<byte[]> ReadPreviewAsync(Stream stream, CancellationToken cancellationToken, bool checkHeader)
     {
+        int bytesRead;
+        
+        if (checkHeader)
+        {
+            var header = new byte[HeaderLength];
+        
+            bytesRead = await stream.ReadAsync(header, 0, HeaderLength, cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            _ = ValidateHeader(bytesRead, header);
+        }
+        
         byte[] previewLengthBytes = new byte[4];
-        int bytesRead = await stream.ReadAsync(previewLengthBytes, 0, 4, cancellationToken).ConfigureAwait(false);
+        bytesRead = await stream.ReadAsync(previewLengthBytes, 0, 4, cancellationToken).ConfigureAwait(false);
 
         if (bytesRead != 4)
         {

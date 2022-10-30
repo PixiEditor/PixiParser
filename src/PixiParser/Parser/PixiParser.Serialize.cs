@@ -13,7 +13,7 @@ public partial class PixiParser
 {
     public static void Serialize(Document document, string path, CancellationToken cancellationToken = default)
     {
-        using var stream = File.OpenWrite(path);
+        using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
         Serialize(document, stream, cancellationToken);
     }
 
@@ -27,9 +27,9 @@ public partial class PixiParser
     public static async Task SerializeAsync(Document document, string path, CancellationToken cancellationToken = default)
     {
         #if NET5_0_OR_GREATER
-        await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+        await using var stream = new FileStream(path, FileMode.Create, FileAccess.Read);
         #else
-        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+        using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
         #endif
         await SerializeAsync(document, stream, cancellationToken).ConfigureAwait(false);
     }

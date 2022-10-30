@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PixiEditor.Parser.Deprecated;
 using PixiEditor.Parser.Helpers;
+using SkiaSharp;
 using Xunit;
 
 namespace PixiEditor.Parser.Tests;
@@ -51,8 +52,8 @@ public class ParserTests
     {
         Document document = new()
         {
-            Height = 1,
-            Width = 1
+            Height = 32,
+            Width = 40
         };
 
         document.Swatches.Add(234, 254, 153, 255);
@@ -71,18 +72,18 @@ public class ParserTests
             0xAC
         };
 
-        document.ReferenceLayer = new ReferenceLayer()
-        {
-            Width = 2,
-            Height = 3,
-            OffsetX = 5,
-            OffsetY = 1,
-            Enabled = false,
-            Guid = Guid.NewGuid(),
-            ImageBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
-            Name = "Reference",
-            Opacity = 0.45f,
-        };
+        // document.ReferenceLayer = new ReferenceLayer()
+        // {
+        //     Width = 2,
+        //     Height = 3,
+        //     OffsetX = 5,
+        //     OffsetY = 1,
+        //     Enabled = false,
+        //     Guid = Guid.NewGuid(),
+        //     ImageBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+        //     Name = "Reference",
+        //     Opacity = 0.45f,
+        // };
 
         var subFolder = new Folder
         {
@@ -91,9 +92,13 @@ public class ParserTests
             Mask = new Mask(),
             Opacity = 0.8f,
         };
-        
-        subFolder.Children.Add(new ImageLayer { Name = "Sublayer1", Enabled = false, Height = 8, Width = 32, ImageBytes = new byte[] { 32, 65, 12, 65, 255  }, OffsetX = 2, OffsetY = 1, Opacity = 0f });
+        //
+        // subFolder.Children.Add(new ImageLayer { Name = "Sublayer1", Enabled = false, Height = 8, Width = 32, ImageBytes = new byte[] { 32, 65, 12, 65, 255  }, OffsetX = 2, OffsetY = 1, Opacity = 0f });
 
+        SKBitmap bitmap = new SKBitmap(40, 32);
+        
+        bitmap.SetPixel(30, 16, SKColors.Beige);
+        
         document.RootFolder = new(new IStructureMember[]
         {
             subFolder,
@@ -101,12 +106,12 @@ public class ParserTests
             {
                 Name = "Layer1",
                 Enabled = true,
-                Height = 2,
-                Width = 8,
-                OffsetX = 2,
-                OffsetY = 5,
-                Opacity = 0.2f,
-                ImageBytes = new byte[] { 65, 21, 74, 32, 104  }
+                Height = 40,
+                Width = 32,
+                OffsetX = 0,
+                OffsetY = 0,
+                Opacity = 0.8f,
+                ImageBytes = bitmap.Encode(SKEncodedImageFormat.Png, 100).ToArray()
             }
         });
 
