@@ -15,8 +15,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>PixiParserLogo.png</PackageIcon>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <Version>2.1.0.2</Version>
-    <PackageVersion>2.1.0.3</PackageVersion>
+    <Version>3.0.0.0</Version>
+    <PackageVersion>3.0.0</PackageVersion>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -32,6 +32,11 @@
 
 	<ItemGroup>
 	  <PackageReference Include="MessagePack" Version="2.2.85" />
+	  <PackageReference Include="MessagePackAnalyzer" Version="2.4.35">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="System.Buffers" Version="4.5.1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

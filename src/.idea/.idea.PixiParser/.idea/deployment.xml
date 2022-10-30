@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="Pi">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$/../../../../../../../Program Files/dotnet/sdk/6.0.202/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_6_default.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/../../../../../../../Program Files/dotnet/sdk/6.0.202/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_6_default.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/../../../../../../../Program Files/dotnet/sdk/6.0.202/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_6_default.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/../../../../../../../Program Files/dotnet/sdk/6.0.202/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_6_default.editorconfig" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/native/amd64/KernelTraceControl.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/native/amd64/msdia140.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/native/amd64/msvcp140.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/native/amd64/vcruntime140.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/native/amd64/vcruntime140_1.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/native/x86/KernelTraceControl.Win61.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/native/x86/KernelTraceControl.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/native/x86/msdia140.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/native/x86/msvcp140.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/native/x86/vcruntime140.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/netstandard1.6/Dia2Lib.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/netstandard1.6/OSExtensions.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.diagnostics.tracing.traceevent/2.0.61/lib/netstandard1.6/TraceReloggerLib.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.net.test.sdk/16.11.0/build/netcoreapp2.1/Microsoft.NET.Test.Sdk.Program.cs" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.testplatform.testhost/16.11.0/build/netcoreapp2.1/x64/Microsoft.TestPlatform.PlatformAbstractions.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.testplatform.testhost/16.11.0/build/netcoreapp2.1/x64/testhost.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/microsoft.testplatform.testhost/16.11.0/build/netcoreapp2.1/x64/testhost.exe" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/xunit.runner.visualstudio/2.4.3/build/netcoreapp2.1/xunit.runner.reporters.netcoreapp10.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/xunit.runner.visualstudio/2.4.3/build/netcoreapp2.1/xunit.runner.utility.netcoreapp10.dll" web="/" />
+            <mapping local="$USER_HOME$/.nuget/packages/xunit.runner.visualstudio/2.4.3/build/netcoreapp2.1/xunit.runner.visualstudio.dotnetcore.testadapter.dll" web="/" />
+            <mapping local="$PROJECT_DIR$/../LICENSE.md" web="/" />
+            <mapping local="$PROJECT_DIR$/../LICENSE.md" web="/" />
+            <mapping local="$PROJECT_DIR$/../PixiParserLogo.png" web="/" />
+            <mapping local="$PROJECT_DIR$/../PixiParserLogo.png" web="/" />
+            <mapping local="$PROJECT_DIR$/.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Benchmarks/Benchmarks/Benchmarks.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Benchmarks/Benchmarks/DeserializationBenchmarks.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Benchmarks/Benchmarks/SerializationBenchmarks.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Benchmarks/Helper.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Benchmarks/PixiParser.Benchmarks.csproj" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Benchmarks/Program.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Benchmarks/obj/Release/net6.0/PixiParser.Benchmarks.AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Benchmarks/obj/Release/net6.0/PixiParser.Benchmarks.GeneratedMSBuildEditorConfig.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Skia/PixiParser.Skia.csproj" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Skia/Properties/PublishProfiles/FolderProfile.pubxml" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Skia/SkiaExtensions.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Skia/SwatchExtensions.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Skia/obj/Release/net6.0/PixiParser.Skia.AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Skia/obj/Release/net6.0/PixiParser.Skia.GeneratedMSBuildEditorConfig.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Skia/obj/Release/netstandard2.0/PixiParser.Skia.AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Skia/obj/Release/netstandard2.0/PixiParser.Skia.GeneratedMSBuildEditorConfig.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Tests/Files/16x16,PE-0.6.pixi" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Tests/Files/16x16,PPD-3.pixi" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Tests/Files/CorruptedPixiFile.pixi" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Tests/Files/OldPixiFile.pixi" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Tests/ParserTests.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Tests/PixiParser.Tests.csproj" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Tests/SkiaTests.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Tests/obj/Release/net6.0/PixiParser.Tests.AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.Tests/obj/Release/net6.0/PixiParser.Tests.GeneratedMSBuildEditorConfig.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser.sln" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Collections/LayerCollection.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Collections/SwatchCollection.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Exceptions/InvalidFileException.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Exceptions/OldFileFormatException.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Helpers/LayerHelpers.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Helpers/StructureHelpers.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Models/SerializableDocument.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Models/SerializableGroup.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Models/SerializableLayer.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Parser/PixiParser.Deserialize.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Parser/PixiParser.Serialize.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Parser/PixiParser.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/PixiParser.csproj" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/Properties/PublishProfiles/FolderProfile.pubxml" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/nuget.config" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/obj/Release/net6.0/PixiParser.AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/obj/Release/net6.0/PixiParser.GeneratedMSBuildEditorConfig.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/obj/Release/netstandard2.0/PixiParser.AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/PixiParser/obj/Release/netstandard2.0/PixiParser.GeneratedMSBuildEditorConfig.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

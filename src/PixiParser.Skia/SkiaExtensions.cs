@@ -1,5 +1,7 @@
 using SkiaSharp;
 using System;
+using System.Linq;
+using PixiEditor.Parser.Helpers;
 
 namespace PixiEditor.Parser.Skia;
 
@@ -8,26 +10,29 @@ public static class SkiaExtensions
     /// <summary>
     /// Creates a new <see cref="SKBitmap"/> from the png bytes of the layer
     /// </summary>
-    public static SKBitmap ToSKBitmap(this SerializableLayer layer) => 
-        SKBitmap.Decode(layer.PngBytes, new SKImageInfo(layer.Width, layer.Height));
+    public static SKBitmap ToSKBitmap(this IImageContainer layer) => 
+        SKBitmap.Decode(layer.ImageBytes);
 
     /// <summary>
     /// Creates a new <see cref="SKImage"/> from the png bytes of the layer
     /// </summary>
-    public static SKImage ToSKImage(this SerializableLayer layer) => SKImage.FromEncodedData(layer.PngBytes);
+    public static SKImage ToSKImage(this IImageContainer layer) => SKImage.FromEncodedData(layer.ImageBytes);
     
     /// <summary>
     /// Encodes the <paramref name="bitmap"/> into the png bytes of the layer
     /// </summary>
     /// <param name="bitmap">The bitmap that should be encoded</param>
     /// <returns><paramref name="layer"/></returns>
-    public static SerializableLayer FromSKBitmap(this SerializableLayer layer, SKBitmap bitmap)
+    public static IImageContainer FromSKBitmap(this IImageContainer layer, SKBitmap bitmap)
     {
-        using SKData data = bitmap.Encode(SKEncodedImageFormat.Png, 100);
+        using var data = bitmap.Encode(SKEncodedImageFormat.Png, 100);
 
-        layer.PngBytes = data.AsSpan().ToArray();
-        layer.Width = bitmap.Width;
-        layer.Height = bitmap.Height;
+        layer.ImageBytes = data.AsSpan().ToArray();
+
+        if (layer is not ISize<int> size) return layer;
+        
+        size.Width = bitmap.Width;
+        size.Height = bitmap.Height;
 
         return layer;
     }
@@ -37,13 +42,16 @@ public static class SkiaExtensions
     /// </summary>
     /// <param name="bitmap">The bitmap that should be encoded</param>
     /// <returns><paramref name="image"/></returns>
-    public static SerializableLayer FromSKImage(this SerializableLayer layer, SKImage image)
+    public static IImageContainer FromSKImage(this IImageContainer layer, SKImage image)
     {
-        using SKData data = image.Encode();
+        using var data = image.Encode();
 
-        layer.PngBytes = data.AsSpan().ToArray();
-        layer.Width = image.Width;
-        layer.Height = image.Height;
+        layer.ImageBytes = data.AsSpan().ToArray();
+        
+        if (layer is not ISize<int> size) return layer;
+        
+        size.Width = image.Width;
+        size.Height = image.Height;
 
         return layer;
     }
@@ -53,38 +61,44 @@ public static class SkiaExtensions
     /// </summary>
     /// <param name="document"></param>
     /// <returns>The <see cref="SKBitmap"/> instance</returns>
-    public static SKBitmap LayersToSKBitmap(this SerializableDocument document)
+    public static SKBitmap LayersToSKBitmap(this Document document)
     {
         SKImageInfo info = new(document.Width, document.Height, SKColorType.RgbaF32, SKAlphaType.Unpremul, SKColorSpace.CreateSrgb());
-        using SKSurface surface = SKSurface.Create(info);
-        SKCanvas canvas = surface.Canvas;
+        using var surface = SKSurface.Create(info);
+        var canvas = surface.Canvas;
         using SKPaint paint = new();
 
-        foreach (SerializableLayer layer in document)
+        foreach (var layer in document.RootFolder.GetChildrenRecursive().OfType<IImageContainer>())
         {
-            if (layer.PngBytes == null || layer.PngBytes.Length == 0)
+            if (layer is not ISize<int> size) continue;
+            
+            if (layer.ImageBytes == null || layer.ImageBytes.Length == 0)
             {
                 continue;
             }
 
-            bool visible = document.Layers.GetFinalLayerVisibilty(layer);
-
+            bool visible = layer.GetFinalVisibility(document);
+            
             if (!visible)
             {
                 continue;
             }
 
-            double opacity = document.Layers.GetFinalLayerOpacity(layer);
+            float opacity = layer is IOpacity opacityLayer ? opacityLayer.GetFinalOpacity(document) : 1;
 
             if (opacity == 0)
             {
                 continue;
             }
 
-            using SKColorFilter filter = SKColorFilter.CreateBlendMode(SKColors.White.WithAlpha((byte)(opacity * 255)), SKBlendMode.DstIn);
+            var finalBlendMode = layer is IBlendMode blendMode
+                ? (int)blendMode.BlendMode != -1 ? blendMode.BlendMode.ToSKBlendMode() : SKBlendMode.SrcOver
+                : SKBlendMode.SrcOver;
+
+            using var filter = SKColorFilter.CreateBlendMode(SKColors.White.WithAlpha((byte)(opacity * 255)), finalBlendMode);
             paint.ColorFilter = filter;
 
-            canvas.DrawImage(layer.ToSKImage(), layer.OffsetX, layer.OffsetY, paint);
+            canvas.DrawImage(layer.ToSKImage(), size.OffsetX, size.OffsetY, paint);
         }
 
         SKBitmap bitmap = new(info);

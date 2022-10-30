@@ -6,26 +6,27 @@ namespace PixiEditor.Parser.Benchmarks;
 
 public static class Helper
 {
-    public static SerializableDocument CreateDocument(int size, int layers, bool encodePng = true)
+    public static Document CreateDocument(int size, int layers, bool encodePng = true)
     {
-        var benchmarkDocument = new SerializableDocument()
+        var benchmarkDocument = new Document()
         {
             Width = size,
             Height = size
         };
 
         benchmarkDocument.Swatches.Add(255, 255, 255, 255);
+        benchmarkDocument.RootFolder = new Folder();
 
         for (int i = 0; i < layers; i++)
         {
-            var layer = new SerializableLayer(size, size);
+            var layer = new ImageLayer();
 
             if (encodePng)
             {
                 layer.FromSKBitmap(CreateSKBitmap(size));
             }
 
-            benchmarkDocument.Layers.Add(layer);
+            benchmarkDocument.RootFolder.Children.Add(layer);
         }
 
         return benchmarkDocument;

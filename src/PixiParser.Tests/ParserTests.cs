@@ -1,3 +1,11 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using PixiEditor.Parser.Deprecated;
+using PixiEditor.Parser.Helpers;
+using SkiaSharp;
 using Xunit;
 
 namespace PixiEditor.Parser.Tests;
@@ -7,120 +15,243 @@ public class ParserTests
     [Fact]
     public void SerializingAndDeserialzingWorks()
     {
-        SerializableDocument document = new()
-        {
-            Height = 1,
-            Width = 1
-        };
+        var document = GetFullDocument();
+        
+        using FileStream stream = new("test.pixi", FileMode.Create);
+        PixiParser.Serialize(document, stream);
 
-        document.Swatches.Add(255, 255, 255);
+        stream.Position = 0;
+        
+        var deserializedDocument = PixiParser.Deserialize(stream);
+        
+        AssertEqual(document, deserializedDocument);
+    }
+    
+    [Fact]
+    public async Task SerializingAndDeserialzingWorksAsync()
+    {
+        var document = GetFullDocument();
 
-        SerializableLayer layer = document.Layers.Add("Base Layer", 1, 1, false, 0.5f, 1, 1);
-        layer.PngBytes = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF };
+        await using FileStream stream = new("testAsync.pixi", FileMode.Create);
+        await PixiParser.SerializeAsync(document, stream);
 
-        document.Groups.Add(new SerializableGroup("Base Group"));
-
-        byte[] serialized = PixiParser.Serialize(document);
-
-        SerializableDocument deserializedDocument = PixiParser.Deserialize(serialized);
-
+        stream.Position = 0;
+        
+        var deserializedDocument = await PixiParser.DeserializeAsync(stream);
+        
         AssertEqual(document, deserializedDocument);
     }
 
     [Fact]
-    public void SerializeAndDeserializeEmptyLayer()
-    {
-        SerializableDocument document = new()
-        {
-            Width = 1,
-            Height = 1
-        };
-
-        document.Layers.Add("Base Layer");
-
-        var serialized = PixiParser.Serialize(document);
-
-        SerializableDocument deserialized = PixiParser.Deserialize(serialized);
-
-        AssertEqual(document, deserialized);
-    }
-
-    [Fact]
-    public void DetectOldFile() => Assert.Throws<OldFileFormatException>(() => PixiParser.Deserialize("./Files/OldPixiFile.pixi"));
+    public void DetectOldFile() => Assert.Throws<OldFileFormatException>(() => DepractedPixiParser.Deserialize("./Files/OldPixiFile.pixi"));
 
     [Fact]
     public void DetectCorruptedFile() => Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./Files/CorruptedPixiFile.pixi"));
 
-    [Fact]
-    public void CanOpenExistingFile() => PixiParser.Deserialize("./Files/16x16,PPD-3.pixi");
-
-    [Fact]
-    public void IsBackwardsCompatible() => PixiParser.Deserialize("./Files/16x16,PE-0.6.pixi");
-
-    [Fact]
-    public void LayerStructureWorks()
+    private static Document GetFullDocument()
     {
-        SerializableDocument document = new();
+        Document document = new()
+        {
+            Height = 32,
+            Width = 40
+        };
 
-        SerializableLayer layer1 = document.Layers.Add("Test Layer 1");
-        SerializableLayer layer2 = document.Layers.Add("Test Layer 2");
-        SerializableLayer layer3 = document.Layers.Add("Test Layer 3");
-        SerializableLayer layer4 = document.Layers.Add("Test Layer 4");
+        document.Swatches.Add(234, 254, 153, 255);
+        document.Swatches.Add(0, 254, 153, 80);
+        document.Swatches.Add(254, 153, 80);
+        
+        document.Palette.Add(234, 254, 153, 255);
+        document.Palette.Add(0, 254, 153, 80);
+        document.Palette.Add(254, 153, 80);
 
-        SerializableGroup group1 = new("Group 1");
-        SerializableGroup group2 = new("Group 1|1");
-        group1.Subgroups.Add(group2);
-        SerializableGroup group3 = new("Group 2");
+        document.PreviewImage = new byte[]
+        {
+            0x42,
+            0x21,
+            0x64,
+            0xAC
+        };
 
-        document.Groups.Add(group1);
-        document.Groups.Add(group2);
-        document.Groups.Add(group3);
+        // document.ReferenceLayer = new ReferenceLayer()
+        // {
+        //     Width = 2,
+        //     Height = 3,
+        //     OffsetX = 5,
+        //     OffsetY = 1,
+        //     Enabled = false,
+        //     Guid = Guid.NewGuid(),
+        //     ImageBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+        //     Name = "Reference",
+        //     Opacity = 0.45f,
+        // };
 
-        document.Layers.AddToGroup(group1, layer1);
-        document.Layers.AddToGroup(group2, layer2);
-        document.Layers.AddToGroup(group1, layer3);
+        var subFolder = new Folder
+        {
+            Name = "Folder1",
+            Enabled = false,
+            Mask = new Mask(),
+            Opacity = 0.8f,
+        };
+        //
+        // subFolder.Children.Add(new ImageLayer { Name = "Sublayer1", Enabled = false, Height = 8, Width = 32, ImageBytes = new byte[] { 32, 65, 12, 65, 255  }, OffsetX = 2, OffsetY = 1, Opacity = 0f });
 
-        document.Layers.AddToGroup(group3, layer4);
+        SKBitmap bitmap = new SKBitmap(40, 32);
+        
+        bitmap.SetPixel(30, 16, SKColors.Beige);
+        
+        document.RootFolder = new(new IStructureMember[]
+        {
+            subFolder,
+            new ImageLayer
+            {
+                Name = "Layer1",
+                Enabled = true,
+                Height = 40,
+                Width = 32,
+                OffsetX = 0,
+                OffsetY = 0,
+                Opacity = 0.8f,
+                ImageBytes = bitmap.Encode(SKEncodedImageFormat.Png, 100).ToArray()
+            }
+        });
 
-        Assert.Equal(0, document.Groups[0].StartLayer);
-        Assert.Equal(2, document.Groups[0].EndLayer);
-
-        Assert.Equal(1, document.Groups[1].StartLayer);
-        Assert.Equal(1, document.Groups[1].EndLayer);
-
-        Assert.Equal(3, document.Groups[2].StartLayer);
-        Assert.Equal(3, document.Groups[2].EndLayer);
-
-        Assert.True(document.Layers.ContainedIn(group1, layer1));
-        Assert.True(document.Layers.ContainedIn(group1, layer2));
-        Assert.True(document.Layers.ContainedIn(group1, layer3));
-        Assert.True(document.Layers.ContainedIn(group2, layer2));
-        Assert.False(document.Layers.ContainedIn(group1, layer4));
-        Assert.True(document.Layers.ContainedIn(group3, layer4));
+        return document;
     }
-
-    private static void AssertEqual(SerializableDocument document, SerializableDocument otherDocument)
+    
+    private static void AssertEqual(Document expectedDocument, Document actualDocument)
     {
-        Assert.Equal(document.FileVersion, otherDocument.FileVersion);
-        Assert.Equal(document.Height, otherDocument.Height);
-        Assert.Equal(document.Width, otherDocument.Width);
-        Assert.Equal(document.Swatches.Count, otherDocument.Swatches.Count);
-        Assert.Equal(document.Layers.Count, document.Layers.Count);
-        Assert.Equal(document.Groups.Count, document.Groups.Count);
+        Assert.Equal(expectedDocument.Version, actualDocument.Version);
+        Assert.Equal(expectedDocument.Height, actualDocument.Height);
+        Assert.Equal(expectedDocument.Width, actualDocument.Width);
+        Assert.Equal(expectedDocument.Swatches.Count, actualDocument.Swatches.Count);
+        Assert.Equal(expectedDocument.RootFolder.GetChildrenRecursive().Count(), actualDocument.RootFolder.GetChildrenRecursive().Count());
 
-        for (int i = 0; i < document.Swatches.Count; i++)
+        if (expectedDocument.PreviewImage == null)
         {
-            Assert.Equal(document.Swatches[i], otherDocument.Swatches[i]);
+            Assert.Empty(actualDocument.PreviewImage);
+        }
+        else
+        {
+            Assert.True(expectedDocument.PreviewImage.SequenceEqual(actualDocument.PreviewImage));
         }
 
-        for (int i = 0; i < document.Layers.Count; i++)
+        AssertMember(expectedDocument.ReferenceLayer, actualDocument.ReferenceLayer);
+
+        for (int i = 0; i < expectedDocument.Swatches.Count; i++)
         {
-            Assert.Equal(document.Layers[i], otherDocument.Layers[i]);
+            Assert.Equal(expectedDocument.Swatches[i], actualDocument.Swatches[i]);
         }
 
-        for (int i = 0; i < document.Groups.Count; i++)
+        for (int i = 0; i < expectedDocument.Palette.Count; i++)
         {
-            Assert.Equal(document.Groups[i], otherDocument.Groups[i]);
+            Assert.Equal(expectedDocument.Swatches[i], actualDocument.Swatches[i]);
+        }
+
+        foreach (var member in expectedDocument.RootFolder.GetChildrenRecursive()
+                     .Zip(actualDocument.RootFolder.GetChildrenRecursive(), (expected, actual) => new { Expected = expected, Actual = actual }))
+        {
+            AssertMember(member.Expected, member.Actual);
+        }
+        
+        void AssertMember(IStructureMember expected, IStructureMember actual)
+        {
+            if (expected is null)
+            {
+                Assert.Null(actual);
+                return;
+            }
+            
+            Assert.Equal(expected.Enabled, actual.Enabled);
+            Assert.IsType(expected.GetType(), actual);
+
+            Matcher matcher = new(expected, actual);
+
+            if (matcher.Match<IChildrenContainer>(out var expectedContainer, out var actualContainer))
+            {
+                foreach (var member in expectedContainer.GetChildrenRecursive()
+                             .Zip(actualContainer.GetChildrenRecursive(), (expected, actual) => new { Expected = expected, Actual = actual }))
+                {
+                    AssertMember(member.Expected, member.Actual);
+                }
+            }
+
+            if (matcher.Match<IGuid>(out var expectedGuid, out var actualGuid))
+            {
+                Assert.Equal(expectedGuid.Guid, actualGuid.Guid);
+            }
+            
+            if (matcher.Match<IImageContainer>(out var expectedImage, out var actualImage))
+            {
+                if (expectedImage.ImageBytes is null)
+                {
+                    Assert.Empty(actualImage.ImageBytes);
+                }
+                else
+                {
+                    Assert.True(expectedImage.ImageBytes.SequenceEqual(actualImage.ImageBytes),
+                        "Actual image bytes did not match expected image bytes");
+                }
+            }
+            
+            if (matcher.Match<IMaskable>(out var expectedMaskable, out var actualMaskable))
+            {
+                AssertMember(expectedMaskable.Mask, actualMaskable.Mask);
+            }
+            
+            if (matcher.Match<IName>(out var expectedName, out var actualName))
+            {
+                Assert.Equal(expectedName.Name, actualName.Name);
+            }
+            
+            if (matcher.Match<IOpacity>(out var expectedOpacity, out var actualOpacity))
+            {
+                Assert.Equal(expectedOpacity.Opacity, actualOpacity.Opacity);
+            }
+            
+            if (matcher.Match<ISize<int>>(out var expectedSize, out var actualSize))
+            {
+                Assert.Equal(expectedSize.Height, actualSize.Height);
+                Assert.Equal(expectedSize.Width, actualSize.Width);
+                Assert.Equal(expectedSize.OffsetX, actualSize.OffsetX);
+                Assert.Equal(expectedSize.OffsetY, actualSize.OffsetY);
+            }
+            
+            if (matcher.Match<ISize<float>>(out var expectedFloatSize, out var actualFloatSize))
+            {
+                Assert.Equal(expectedFloatSize.Height, actualFloatSize.Height);
+                Assert.Equal(expectedFloatSize.Width, actualFloatSize.Width);
+            }
+        }
+    }
+    
+#nullable enable
+
+    private class Matcher
+    {
+        private IStructureMember Expected { get; }
+        
+        private IStructureMember Actual { get; }
+        
+        public Matcher(IStructureMember expected, IStructureMember actual)
+        {
+            Expected = expected;
+            Actual = actual;
+        }
+        
+        public bool Match<T>(
+            [NotNullWhen(true)] out T? expected,
+            [NotNullWhen(true)] out T? actual)
+            where T : IStructureMember
+        {
+            expected = default;
+            actual = default;
+        
+            if (Expected is not T ex || Actual is not T ac) return false;
+        
+            expected = ex;
+            actual = ac;
+
+            return true;
         }
     }
 }

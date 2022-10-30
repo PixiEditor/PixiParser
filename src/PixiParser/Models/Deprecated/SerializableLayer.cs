@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace PixiEditor.Parser;
+namespace PixiEditor.Parser.Deprecated;
 
 [DataContract]
 [DebuggerDisplay("{DebuggerDisplay,nq}")]

@@ -1,10 +1,11 @@
-﻿using PixiEditor.Parser.Helpers;
+﻿using PixiEditor.Parser.Deprecated;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using PixiEditor.Parser.Helpers.Deprecated;
 
-namespace PixiEditor.Parser.Collections;
+namespace PixiEditor.Parser.Collections.Deprecated;
 
 [DebuggerDisplay("Count = {Count}")]
 public class LayerCollection : IList<SerializableLayer>

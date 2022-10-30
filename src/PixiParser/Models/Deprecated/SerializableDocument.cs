@@ -1,11 +1,11 @@
-﻿using PixiEditor.Parser.Collections;
+﻿using PixiEditor.Parser.Collections.Deprecated;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace PixiEditor.Parser;
+namespace PixiEditor.Parser.Deprecated;
 
 [DataContract]
 public class SerializableDocument : IEnumerable<SerializableLayer>

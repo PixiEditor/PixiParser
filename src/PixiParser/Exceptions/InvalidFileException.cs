@@ -5,6 +5,8 @@ namespace PixiEditor.Parser;
 [Serializable]
 public class InvalidFileException : Exception
 {
+    public Document Document { get; internal set; }
+    
     public InvalidFileException() { }
     public InvalidFileException(string message) : base(message) { }
     public InvalidFileException(string message, Exception inner) : base(message, inner) { }
