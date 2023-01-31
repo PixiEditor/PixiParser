@@ -2,7 +2,7 @@
 
 public enum BlendMode
 {
-    Unknown,
+    Unknown = -1,
     Normal,
     Darken,
     Multiply,

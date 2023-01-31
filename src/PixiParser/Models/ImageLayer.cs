@@ -6,7 +6,7 @@ namespace PixiEditor.Parser;
 
 [MessagePackObject]
 [DebuggerDisplay("'{Name, nq}' {Width}x{Height}")]
-public sealed class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, IOpacity, ISize<int>
+public sealed class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, IOpacity, ISize<int>, IClipToLayerBelow
 {
     [IgnoreMember]
     private float _opacity = 1;
@@ -50,4 +50,7 @@ public sealed class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, 
 
     [Key(10)]
     int IImageContainer.ResourceSize { get; set; }
+    
+    [Key(11)]
+    public bool ClipToMemberBelow { get; set; }
 }

@@ -8,7 +8,7 @@ namespace PixiEditor.Parser;
 
 [MessagePackObject]
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public sealed class Folder : IName, IChildrenContainer, IBlendMode, IMaskable, IOpacity
+public sealed class Folder : IName, IChildrenContainer, IBlendMode, IMaskable, IOpacity, IClipToLayerBelow
 {
     [IgnoreMember]
     private float _opacity = 1;
@@ -64,4 +64,7 @@ public sealed class Folder : IName, IChildrenContainer, IBlendMode, IMaskable, I
 
     [Key(5)]
     public BlendMode BlendMode { get; set; }
+
+    [Key(6)]
+    public bool ClipToMemberBelow { get; set; }
 }
