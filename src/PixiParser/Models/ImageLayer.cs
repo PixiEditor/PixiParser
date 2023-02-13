@@ -53,4 +53,7 @@ public sealed class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, 
     
     [Key(11)]
     public bool ClipToMemberBelow { get; set; }
+    
+    [Key(12)]
+    public bool LockAlpha { get; set; }
 }
