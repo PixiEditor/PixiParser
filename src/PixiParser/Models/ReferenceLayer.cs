@@ -48,4 +48,7 @@ public class ReferenceLayer : IImageContainer, IName, ISize<float>, IOpacity, IG
     
     [Key(9)]
     int IImageContainer.ResourceSize { get; set; }
+    
+    [Key(10)]
+    public bool Topmost { get; set; }
 }
