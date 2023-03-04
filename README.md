@@ -69,6 +69,6 @@ dotnet add package PixiEditor.Parser.Skia
 
 You can find support here:
 
-* Ask on our [Discord](https://discord.gg/psrCP35kdk)
+* Ask on our [Discord](https://discord.gg/qSRMYmq)
 * Open a [Issue](https://github.com/PixiEditor/PixiParser/issues/new)
 
