@@ -3,7 +3,7 @@
 namespace PixiEditor.Parser;
 
 [MessagePackObject]
-public class Corners
+public struct Corners
 {
     [Key(0)]
     public Vector2 TopLeft { get; set; }
