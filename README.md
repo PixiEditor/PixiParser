@@ -14,7 +14,7 @@ Use `PixiParser.Deserialize()` to deserialize a document and `PixiParser.Seriali
 using PixiEditor.Parser;
 
 
-SerializableDocument document = PixiParser.Deserialize("./pixiFile.pixi");
+Document document = PixiParser.Deserialize("./pixiFile.pixi");
 
 // Do some stuff with the document
 
@@ -42,14 +42,14 @@ We provide a package containing extensions for working with [SkiaSharp](https://
 ```cs
 using PixiEditor.Parser.Skia;
 
-// Get a SKImage from the png data of the SerializableLayer
+// Get a SKImage from the png data of a IImageContainer (e.g. ImageLayer or ReferenceLayer)
 SKImage image = layer.ToSKImage();
 ```
 
 ```cs
 using PixiEditor.Parser.Skia;
 
-// Encode the image data of the SKImage into the png data of the SerializableLayer
+// Encode the image data of the SKImage into the png data of a IImageContainer (e.g. ImageLayer or ReferenceLayer)
 layer.FromSKImage(image);
 ```
 
@@ -69,6 +69,6 @@ dotnet add package PixiEditor.Parser.Skia
 
 You can find support here:
 
-* Ask on [Discord](https://discord.gg/psrCP35kdk)
+* Ask on our [Discord](https://discord.gg/psrCP35kdk)
 * Open a [Issue](https://github.com/PixiEditor/PixiParser/issues/new)
 
