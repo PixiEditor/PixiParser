@@ -51,4 +51,7 @@ public class ReferenceLayer : IImageContainer, IName, ISize<float>, IOpacity, IG
     
     [Key(10)]
     public bool Topmost { get; set; }
+    
+    [Key(11)]
+    public Corners Corners { get; set; }
 }

@@ -114,7 +114,7 @@ public static class DepractedPixiParser
         {
             int newRead = stream.Read(buffer, read, count - read);
             if (newRead == 0)
-                throw new Exception($"The stream doesn't contain {count} bytes");
+                throw new InvalidFileException($"The stream doesn't contain {count} bytes");
             read += newRead;
         }
     }
