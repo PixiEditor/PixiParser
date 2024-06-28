@@ -7,7 +7,7 @@ namespace PixiEditor.Parser;
 
 [MessagePackObject]
 [DebuggerDisplay("'{Name,nq}' {Width}x{Height}")]
-public class ReferenceLayer : IImageContainer, IName, ISize<float>, IOpacity, IGuid
+public class ReferenceLayer : IImageContainer, IName, ISize<float>, IStructureOpacity, IGuid
 {
     [IgnoreMember]
     private float _opacity = 1;

@@ -1,9 +1,9 @@
 ﻿namespace PixiEditor.Parser;
 
 /// <summary>
-/// A structure member that has a bitmap
+/// A member that has a bitmap
 /// </summary>
-public interface IImageContainer : IStructureMember
+public interface IImageContainer
 {
     /// <summary>
     /// A byte array containing the bytes for the png image

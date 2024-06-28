@@ -84,6 +84,9 @@ public sealed class Document
     [Key(5)]
     public ReferenceLayer ReferenceLayer { get; set; }
     
+    [Key(6)]
+    public AnimationData AnimationData { get; set; }
+    
     private ColorCollection GetColorCollection(ref ColorCollection variable)
     {
         if (variable is null)

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <RootNamespace>PixiEditor.Parser.Skia</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -17,13 +17,13 @@
     <PackageId>PixiEditor.Parser.Skia</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>PixiParserLogo.png</PackageIcon>
-    <Version>2.0.0.1</Version>
+    <Version>2.0.0.2</Version>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageVersion>3.0.0</PackageVersion>
+    <PackageVersion>3.0.1</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="2.80.3" />
+    <PackageReference Include="SkiaSharp" Version="2.88.8" />
   </ItemGroup>
 
   <ItemGroup>

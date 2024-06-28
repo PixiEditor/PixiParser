@@ -13,7 +13,7 @@ namespace PixiEditor.Parser.Tests;
 public class ParserTests
 {
     [Fact]
-    public void SerializingAndDeserialzingWorks()
+    public void SerializingAndDeserializingWorks()
     {
         var document = GetFullDocument();
         
@@ -166,7 +166,7 @@ public class ParserTests
 
             Matcher matcher = new(expected, actual);
 
-            if (matcher.Match<IChildrenContainer>(out var expectedContainer, out var actualContainer))
+            if (matcher.Match<IStructureChildrenContainer>(out var expectedContainer, out var actualContainer))
             {
                 foreach (var member in expectedContainer.GetChildrenRecursive()
                              .Zip(actualContainer.GetChildrenRecursive(), (expected, actual) => new { Expected = expected, Actual = actual }))
@@ -203,7 +203,7 @@ public class ParserTests
                 Assert.Equal(expectedName.Name, actualName.Name);
             }
             
-            if (matcher.Match<IOpacity>(out var expectedOpacity, out var actualOpacity))
+            if (matcher.Match<IStructureOpacity>(out var expectedOpacity, out var actualOpacity))
             {
                 Assert.Equal(expectedOpacity.Opacity, actualOpacity.Opacity);
             }
@@ -228,11 +228,11 @@ public class ParserTests
 
     private class Matcher
     {
-        private IStructureMember Expected { get; }
+        private object Expected { get; }
         
-        private IStructureMember Actual { get; }
+        private object Actual { get; }
         
-        public Matcher(IStructureMember expected, IStructureMember actual)
+        public Matcher(object expected, object actual)
         {
             Expected = expected;
             Actual = actual;
@@ -241,7 +241,6 @@ public class ParserTests
         public bool Match<T>(
             [NotNullWhen(true)] out T? expected,
             [NotNullWhen(true)] out T? actual)
-            where T : IStructureMember
         {
             expected = default;
             actual = default;

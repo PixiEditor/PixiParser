@@ -5,7 +5,7 @@ namespace PixiEditor.Parser;
 
 [MessagePackObject]
 [DebuggerDisplay("{Width}x{Height}")]
-public sealed class Mask : IImageContainer, ISize<int>
+public sealed class Mask : IImageContainer, ISize<int>, IStructureMember
 {
     [Key(0)]
     public bool Enabled { get; set; }

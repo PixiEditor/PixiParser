@@ -17,37 +17,37 @@ public partial class PixiParser
         using var stream = new MemoryStream(buffer);
         return Deserialize(stream, cancellationToken);
     }
-    
+
     public static Document Deserialize(string path, CancellationToken cancellationToken = default)
     {
         using var stream = File.OpenRead(path);
         return Deserialize(stream, cancellationToken);
     }
-    
+
     public static async Task<Document> DeserializeAsync(string path, CancellationToken cancellationToken = default)
     {
-        #if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER
         await using var stream = File.OpenRead(path);
-        #else
+#else
         using var stream = File.OpenRead(path);
-        #endif
+#endif
         return await DeserializeAsync(stream, cancellationToken).ConfigureAwait(false);
     }
 
     public static Document Deserialize(Stream stream, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        
+
         var header = new byte[HeaderLength];
-        
+
         var bytesRead = stream.Read(header, 0, HeaderLength);
-        
+
         cancellationToken.ThrowIfCancellationRequested();
 
         var version = ValidateHeader(bytesRead, header)!.Value;
 
         byte[] preview = ReadPreview(stream, false);
-        
+
         Document document;
 
         try
@@ -60,76 +60,55 @@ public partial class PixiParser
             // Make compiler happy :]
             return null;
         }
-        
+
         document.Version = version.version;
         document.MinVersion = version.minVersion;
-        
+
         document.PreviewImage = preview;
 
         var members = document.RootFolder.GetChildrenRecursive().ToList();
-        
+
         if (document.ReferenceLayer != null)
         {
             members.Add(document.ReferenceLayer);
         }
-        
+
         foreach (var member in members)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             if (member is IImageContainer image)
             {
-                int totalRead = 0;
-                image.ImageBytes = new byte[image.ResourceSize];
-
-                bytesRead = 0;
-                do
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    bytesRead = stream.Read(image.ImageBytes, 0, image.ImageBytes.Length - bytesRead);
-                    totalRead += bytesRead;
-                } while (bytesRead > 0);
-                
-                if (totalRead != image.ResourceSize)
-                {
-                    ThrowInvalidResourceSize(image, document, totalRead, members, stream);
-                }
+                ReadImage(stream, cancellationToken, image, document).Wait(cancellationToken);
             }
 
             if (member is IMaskable { Mask: IImageContainer mask })
             {
-                int totalRead = 0;
-                mask.ImageBytes = new byte[mask.ResourceSize];
-
-                bytesRead = 0;
-                do
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    bytesRead = stream.Read(mask.ImageBytes, 0, mask.ImageBytes.Length - bytesRead);
-                    totalRead += bytesRead;
-                } while (bytesRead > 0);
-                
-                if (totalRead != mask.ResourceSize)
-                {
-                    ThrowInvalidResourceSize(mask, document, totalRead, members, stream);
-                }
+                ReadImage(stream, cancellationToken, mask, document).Wait(cancellationToken);
             }
         }
 
+        if (document.AnimationData != null)
+        {
+            List<IKeyFrame> keyFrames = document.AnimationData.KeyFrameGroups.Cast<IKeyFrame>().ToList();
+             ReadKeyFrameImages(stream, cancellationToken, keyFrames, document).Wait(cancellationToken);
+        }
+
+
         return document;
     }
-    
+
     public static async Task<Document> DeserializeAsync(Stream stream, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        
+
         var header = new byte[HeaderLength];
-        
+
         var bytesRead = await stream.ReadAsync(header, 0, HeaderLength, cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
 
         var version = ValidateHeader(bytesRead, header)!.Value;
-        
+
         if (FileVersion < version.minVersion)
         {
             throw new InvalidFileException(
@@ -145,7 +124,8 @@ public partial class PixiParser
 
         try
         {
-            document = await MessagePackSerializer.DeserializeAsync<Document>(stream, MessagePackOptions, cancellationToken).ConfigureAwait(false);
+            document = await MessagePackSerializer
+                .DeserializeAsync<Document>(stream, MessagePackOptions, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -158,98 +138,119 @@ public partial class PixiParser
         document.MinVersion = version.minVersion;
 
         document.PreviewImage = preview;
-        
+
         var members = document.RootFolder.GetChildrenRecursive().ToList();
-        
+
         if (document.ReferenceLayer != null)
         {
             members.Add(document.ReferenceLayer);
         }
-        
+
         foreach (var member in members)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             if (member is IImageContainer image)
             {
-                int totalRead = 0;
-                image.ImageBytes = new byte[image.ResourceSize];
-
-                bytesRead = 0;
-                do
-                {
-                    #if NET5_0_OR_GREATER
-                    bytesRead = await stream.ReadAsync(image.ImageBytes.AsMemory(0, image.ImageBytes.Length - bytesRead), cancellationToken).ConfigureAwait(false);
-                    #else
-                    bytesRead = await stream.ReadAsync(image.ImageBytes, 0, image.ImageBytes.Length - bytesRead, cancellationToken).ConfigureAwait(false);
-                    #endif
-                    cancellationToken.ThrowIfCancellationRequested();
-                    totalRead += bytesRead;
-                } while (bytesRead > 0);
-                
-                if (totalRead != image.ResourceSize)
-                {
-                    ThrowInvalidResourceSize(image, document, totalRead, members, stream);
-                }
+                await ReadImage(stream, cancellationToken, image, document);
             }
 
             if (member is IMaskable { Mask: IImageContainer mask })
             {
-                int totalRead = 0;
-                mask.ImageBytes = new byte[mask.ResourceSize];
-
-                bytesRead = 0;
-                do
-                {
-                    #if NET5_0_OR_GREATER
-                    bytesRead = await stream.ReadAsync(mask.ImageBytes.AsMemory(0, mask.ImageBytes.Length - bytesRead), cancellationToken).ConfigureAwait(false);
-                    #else
-                    bytesRead = await stream.ReadAsync(mask.ImageBytes, 0, mask.ImageBytes.Length - bytesRead, cancellationToken).ConfigureAwait(false);
-                    #endif
-                    cancellationToken.ThrowIfCancellationRequested();
-                    totalRead += bytesRead;
-                } while (bytesRead > 0);
-                
-                if (totalRead != mask.ResourceSize)
-                {
-                    ThrowInvalidResourceSize(mask, document, totalRead, members, stream);
-                }
+                await ReadImage(stream, cancellationToken, mask, document);
             }
+        }
+
+        if (document.AnimationData != null)
+        {
+            List<IKeyFrame> keyFrames = document.AnimationData.KeyFrameGroups.Cast<IKeyFrame>().ToList();
+            await ReadKeyFrameImages(stream, cancellationToken, keyFrames, document);
         }
 
         return document;
     }
-    
-    private static (Version version, Version minVersion)? ValidateHeader(int bytesRead, ReadOnlySpan<byte> header, bool skipVersion = false)
+
+    private static async Task ReadKeyFrameImages(Stream stream, CancellationToken cancellationToken,
+        List<IKeyFrame> keyFrameGroups,
+        Document document)
+    {
+        foreach (var keyFrame in keyFrameGroups)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (keyFrame is IKeyFrameChildrenContainer container && container.Children.Count != 0)
+            {
+                await ReadKeyFrameImages(stream, cancellationToken, container.Children, document);
+            }
+
+            if (keyFrame is IImageContainer image)
+            {
+                await ReadImage(stream, cancellationToken, image, document);
+            }
+        }
+    }
+
+    private static async Task ReadImage(Stream stream, CancellationToken cancellationToken, IImageContainer image,
+        Document document)
+    {
+        int bytesRead;
+        int totalRead = 0;
+        image.ImageBytes = new byte[image.ResourceSize];
+
+        bytesRead = 0;
+        do
+        {
+#if NET5_0_OR_GREATER
+            bytesRead =
+                await stream
+                    .ReadAsync(image.ImageBytes.AsMemory(0, image.ImageBytes.Length - bytesRead), cancellationToken)
+                    .ConfigureAwait(false);
+#else
+            bytesRead = await stream
+                .ReadAsync(image.ImageBytes, 0, image.ImageBytes.Length - bytesRead, cancellationToken)
+                .ConfigureAwait(false);
+#endif
+            cancellationToken.ThrowIfCancellationRequested();
+            totalRead += bytesRead;
+        } while (bytesRead > 0);
+
+        if (totalRead != image.ResourceSize)
+        {
+            ThrowInvalidResourceSize(image, document, totalRead, stream);
+        }
+    }
+
+    private static (Version version, Version minVersion)? ValidateHeader(int bytesRead, ReadOnlySpan<byte> header,
+        bool skipVersion = false)
     {
         if (bytesRead != HeaderLength)
         {
-            throw new InvalidFileException($"Header was not of expected length. Expected {HeaderLength} bytes, but got {bytesRead} bytes.");
+            throw new InvalidFileException(
+                $"Header was not of expected length. Expected {HeaderLength} bytes, but got {bytesRead} bytes.");
         }
-        
+
         if (!header.Slice(0, MagicLength).SequenceEqual(Magic))
         {
             throw new InvalidFileException("Header did not start with expected magic");
         }
-        
+
         if (skipVersion)
         {
             return null;
         }
-        
+
         return (ReadVersion(header.Slice(HeaderLength - 16, 8)), ReadVersion(header.Slice(HeaderLength - 8, 8)));
     }
 
     private static Version ReadVersion(ReadOnlySpan<byte> buffer)
     {
-        #if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER
         int major = BitConverter.ToInt32(buffer[..4]);
         int minor = BitConverter.ToInt32(buffer[4..8]);
-        #else
+#else
         byte[] byteBuffer = buffer.ToArray();
         int major = BitConverter.ToInt32(byteBuffer, 0);
         int minor = BitConverter.ToInt32(byteBuffer, 4);
-        #endif
+#endif
 
         return new Version(major, minor);
     }
@@ -261,12 +262,12 @@ public partial class PixiParser
         };
 
     private static void
-        ThrowInvalidResourceSize(IImageContainer member, Document document, int totalRead,
-            IEnumerable<IStructureMember> members, Stream stream) => throw new InvalidFileException(
-        $"Expected to read {member.ResourceSize} bytes, but only read {totalRead} bytes for layer {member.GetDebugName(members) ?? "{null}"}. Expected at offset {member.ResourceSize} with the size {member.ResourceSize} (Current Stream Position: {stream.Position}).")
-    {
-        Document = document
-    };
+        ThrowInvalidResourceSize(IImageContainer member, Document document, int totalRead, Stream stream) =>
+        throw new InvalidFileException(
+            $"Expected to read {member.ResourceSize} bytes, but only read {totalRead} bytes. Expected at offset {member.ResourceSize} with the size {member.ResourceSize} (Current Stream Position: {stream.Position}).")
+        {
+            Document = document
+        };
 
     public static byte[] ReadPreview(Stream stream) => ReadPreview(stream, true);
 
@@ -277,12 +278,12 @@ public partial class PixiParser
         if (checkHeader)
         {
             var header = new byte[HeaderLength];
-        
+
             bytesRead = stream.Read(header, 0, HeaderLength);
-            
+
             _ = ValidateHeader(bytesRead, header);
         }
-        
+
         byte[] previewLengthBytes = new byte[4];
         bytesRead = stream.Read(previewLengthBytes, 0, 4);
 
@@ -290,11 +291,11 @@ public partial class PixiParser
         {
             throw new InvalidFileException();
         }
-        
+
         byte[] previewData = new byte[BitConverter.ToInt32(previewLengthBytes, 0)];
 
         int left = previewData.Length;
-        
+
         do
         {
             bytesRead = stream.Read(previewData, 0, previewData.Length);
@@ -305,26 +306,28 @@ public partial class PixiParser
         {
             throw new InvalidFileException("Reached end of stream while reading preview");
         }
-        
+
         return previewData;
     }
 
-    public static Task<byte[]> ReadPreviewAsync(Stream stream, CancellationToken cancellationToken = default) => ReadPreviewAsync(stream, cancellationToken, true);
-    
-    private static async Task<byte[]> ReadPreviewAsync(Stream stream, CancellationToken cancellationToken, bool checkHeader)
+    public static Task<byte[]> ReadPreviewAsync(Stream stream, CancellationToken cancellationToken = default) =>
+        ReadPreviewAsync(stream, cancellationToken, true);
+
+    private static async Task<byte[]> ReadPreviewAsync(Stream stream, CancellationToken cancellationToken,
+        bool checkHeader)
     {
         int bytesRead;
-        
+
         if (checkHeader)
         {
             var header = new byte[HeaderLength];
-        
+
             bytesRead = await stream.ReadAsync(header, 0, HeaderLength, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
 
             _ = ValidateHeader(bytesRead, header);
         }
-        
+
         byte[] previewLengthBytes = new byte[4];
         bytesRead = await stream.ReadAsync(previewLengthBytes, 0, 4, cancellationToken).ConfigureAwait(false);
 
@@ -332,16 +335,17 @@ public partial class PixiParser
         {
             throw new InvalidFileException("Reached end of stream while reading preview length");
         }
-        
+
         byte[] previewData = new byte[BitConverter.ToInt32(previewLengthBytes, 0)];
         int left = previewData.Length;
-        
+
         do
         {
-            bytesRead = await stream.ReadAsync(previewData, 0, previewData.Length, cancellationToken).ConfigureAwait(false);
+            bytesRead = await stream.ReadAsync(previewData, 0, previewData.Length, cancellationToken)
+                .ConfigureAwait(false);
             left -= bytesRead;
         } while (bytesRead != 0 && left != 0);
-        
+
         if (left != 0)
         {
             throw new InvalidFileException("Reached end of stream while reading preview");

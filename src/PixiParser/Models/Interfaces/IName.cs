@@ -1,6 +1,6 @@
 ﻿namespace PixiEditor.Parser;
 
-public interface IName : IStructureMember
+public interface IName  
 {
     public string Name { get; set; }
 }

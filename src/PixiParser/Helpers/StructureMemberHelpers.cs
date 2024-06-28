@@ -16,38 +16,38 @@ public static class StructureMemberHelpers
         variable = value;
     }
 
-    public static Stack<IChildrenContainer> GetParents(this IStructureMember member, Document document) =>
+    public static Stack<IStructureChildrenContainer> GetParents(this IStructureMember member, Document document) =>
         GetParents(member, document.RootFolder);
 
-    public static Stack<IChildrenContainer> GetParents(this IStructureMember member, IChildrenContainer root)
+    public static Stack<IStructureChildrenContainer> GetParents(this IStructureMember member, IStructureChildrenContainer root)
     {
-        var parents = new Stack<IChildrenContainer>();
+        var parents = new Stack<IStructureChildrenContainer>();
 
         GetParents(member, root, parents);
         
         return parents;
     }
     
-    private static void GetParents(this IStructureMember member, IChildrenContainer root, Stack<IChildrenContainer> parents)
+    private static void GetParents(this IStructureMember member, IStructureChildrenContainer root, Stack<IStructureChildrenContainer> parents)
     {
         foreach (var children in root.Children)
         {
             if (children == member) return; // Found the member
-            if (member is not IChildrenContainer container) continue; // Not the member nor a container, skip
+            if (member is not IStructureChildrenContainer container) continue; // Not the member nor a container, skip
             
             parents.Push(container);
             GetParents(member, container, parents);
         }
     }
     
-    public static float GetFinalOpacity(this IOpacity member, Document document) =>
-        member.Opacity == 0 ? 0 : member.GetParents(document).OfType<IOpacity>()
+    public static float GetFinalOpacity(this IStructureOpacity member, Document document) =>
+        member.Opacity == 0 ? 0 : member.GetParents(document).OfType<IStructureOpacity>()
             .Aggregate(member.Opacity, (current, parent) => current * parent.Opacity);
 
     public static bool GetFinalVisibility(this IStructureMember member, Document document) =>
         member.Enabled && member.GetParents(document).All(parent => parent.Enabled);
 
-    public static IEnumerable<IStructureMember> GetChildrenRecursive(this IChildrenContainer container)
+    public static IEnumerable<IStructureMember> GetChildrenRecursive(this IStructureChildrenContainer container)
     {
         foreach (var member in container.Children)
         {

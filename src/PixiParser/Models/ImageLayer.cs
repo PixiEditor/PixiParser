@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using MessagePack;
 using PixiEditor.Parser.Helpers;
 
@@ -6,7 +7,7 @@ namespace PixiEditor.Parser;
 
 [MessagePackObject]
 [DebuggerDisplay("'{Name, nq}' {Width}x{Height}")]
-public sealed class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, IOpacity, ISize<int>, IClipToLayerBelow
+public sealed class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, IStructureOpacity, ISize<int>, IClipToLayerBelow, IStructureMember
 {
     [IgnoreMember]
     private float _opacity = 1;
@@ -56,4 +57,7 @@ public sealed class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, 
     
     [Key(12)]
     public bool LockAlpha { get; set; }
+    
+    [Key(13)]
+    public Guid Guid { get; set; }
 }

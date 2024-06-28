@@ -2,7 +2,7 @@
 
 namespace PixiEditor.Parser;
 
-public interface ISize<T> : IStructureMember where T : unmanaged
+public interface ISize<T> where T : unmanaged
 {
     public T Width { get; set; }
     

@@ -2,7 +2,7 @@
 
 namespace PixiEditor.Parser;
 
-public interface IGuid : IStructureMember
+public interface IGuid 
 {
     public Guid Guid { get; set; }
 }

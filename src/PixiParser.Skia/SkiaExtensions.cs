@@ -77,14 +77,14 @@ public static class SkiaExtensions
                 continue;
             }
 
-            bool visible = layer.GetFinalVisibility(document);
+            bool visible = layer is IStructureMember sm && sm.GetFinalVisibility(document);
             
             if (!visible)
             {
                 continue;
             }
 
-            float opacity = layer is IOpacity opacityLayer ? opacityLayer.GetFinalOpacity(document) : 1;
+            float opacity = layer is IStructureOpacity opacityLayer ? opacityLayer.GetFinalOpacity(document) : 1;
 
             if (opacity == 0)
             {
