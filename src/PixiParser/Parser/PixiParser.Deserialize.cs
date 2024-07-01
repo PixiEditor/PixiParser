@@ -26,11 +26,7 @@ public partial class PixiParser
 
     public static async Task<Document> DeserializeAsync(string path, CancellationToken cancellationToken = default)
     {
-#if NET5_0_OR_GREATER
-        await using var stream = File.OpenRead(path);
-#else
         using var stream = File.OpenRead(path);
-#endif
         return await DeserializeAsync(stream, cancellationToken).ConfigureAwait(false);
     }
 
@@ -79,19 +75,19 @@ public partial class PixiParser
 
             if (member is IImageContainer image)
             {
-                ReadImage(stream, cancellationToken, image, document).Wait(cancellationToken);
+                ReadImage(stream, cancellationToken, image, document);
             }
 
             if (member is IMaskable { Mask: IImageContainer mask })
             {
-                ReadImage(stream, cancellationToken, mask, document).Wait(cancellationToken);
+                ReadImage(stream, cancellationToken, mask, document);
             }
         }
 
         if (document.AnimationData != null)
         {
             List<IKeyFrame> keyFrames = document.AnimationData.KeyFrameGroups.Cast<IKeyFrame>().ToList();
-             ReadKeyFrameImages(stream, cancellationToken, keyFrames, document).Wait(cancellationToken);
+            ReadKeyFrameImages(stream, cancellationToken, keyFrames, document);
         }
 
 
@@ -152,25 +148,25 @@ public partial class PixiParser
 
             if (member is IImageContainer image)
             {
-                await ReadImage(stream, cancellationToken, image, document);
+                await ReadImageAsync(stream, cancellationToken, image, document);
             }
 
             if (member is IMaskable { Mask: IImageContainer mask })
             {
-                await ReadImage(stream, cancellationToken, mask, document);
+                await ReadImageAsync(stream, cancellationToken, mask, document);
             }
         }
 
         if (document.AnimationData != null)
         {
             List<IKeyFrame> keyFrames = document.AnimationData.KeyFrameGroups.Cast<IKeyFrame>().ToList();
-            await ReadKeyFrameImages(stream, cancellationToken, keyFrames, document);
+            await ReadKeyFrameImagesAsync(stream, cancellationToken, keyFrames, document);
         }
 
         return document;
     }
 
-    private static async Task ReadKeyFrameImages(Stream stream, CancellationToken cancellationToken,
+    private static async Task ReadKeyFrameImagesAsync(Stream stream, CancellationToken cancellationToken,
         List<IKeyFrame> keyFrameGroups,
         Document document)
     {
@@ -179,17 +175,36 @@ public partial class PixiParser
             cancellationToken.ThrowIfCancellationRequested();
             if (keyFrame is IKeyFrameChildrenContainer container && container.Children.Count != 0)
             {
-                await ReadKeyFrameImages(stream, cancellationToken, container.Children, document);
+                await ReadKeyFrameImagesAsync(stream, cancellationToken, container.Children, document);
             }
 
             if (keyFrame is IImageContainer image)
             {
-                await ReadImage(stream, cancellationToken, image, document);
+                await ReadImageAsync(stream, cancellationToken, image, document);
+            }
+        }
+    }
+    
+    private static void ReadKeyFrameImages(Stream stream, CancellationToken cancellationToken,
+        List<IKeyFrame> keyFrameGroups,
+        Document document)
+    {
+        foreach (var keyFrame in keyFrameGroups)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (keyFrame is IKeyFrameChildrenContainer container && container.Children.Count != 0)
+            {
+                ReadKeyFrameImages(stream, cancellationToken, container.Children, document);
+            }
+
+            if (keyFrame is IImageContainer image)
+            {
+                ReadImage(stream, cancellationToken, image, document);
             }
         }
     }
 
-    private static async Task ReadImage(Stream stream, CancellationToken cancellationToken, IImageContainer image,
+    private static async Task ReadImageAsync(Stream stream, CancellationToken cancellationToken, IImageContainer image,
         Document document)
     {
         int bytesRead;
@@ -199,16 +214,30 @@ public partial class PixiParser
         bytesRead = 0;
         do
         {
-#if NET5_0_OR_GREATER
-            bytesRead =
-                await stream
-                    .ReadAsync(image.ImageBytes.AsMemory(0, image.ImageBytes.Length - bytesRead), cancellationToken)
-                    .ConfigureAwait(false);
-#else
             bytesRead = await stream
                 .ReadAsync(image.ImageBytes, 0, image.ImageBytes.Length - bytesRead, cancellationToken)
                 .ConfigureAwait(false);
-#endif
+            cancellationToken.ThrowIfCancellationRequested();
+            totalRead += bytesRead;
+        } while (bytesRead > 0);
+
+        if (totalRead != image.ResourceSize)
+        {
+            ThrowInvalidResourceSize(image, document, totalRead, stream);
+        }
+    }
+    
+    private static void ReadImage(Stream stream, CancellationToken cancellationToken, IImageContainer image,
+        Document document)
+    {
+        int bytesRead;
+        int totalRead = 0;
+        image.ImageBytes = new byte[image.ResourceSize];
+
+        bytesRead = 0;
+        do
+        {
+            bytesRead = stream.Read(image.ImageBytes, 0, image.ImageBytes.Length - bytesRead);
             cancellationToken.ThrowIfCancellationRequested();
             totalRead += bytesRead;
         } while (bytesRead > 0);
@@ -243,14 +272,9 @@ public partial class PixiParser
 
     private static Version ReadVersion(ReadOnlySpan<byte> buffer)
     {
-#if NET5_0_OR_GREATER
-        int major = BitConverter.ToInt32(buffer[..4]);
-        int minor = BitConverter.ToInt32(buffer[4..8]);
-#else
         byte[] byteBuffer = buffer.ToArray();
         int major = BitConverter.ToInt32(byteBuffer, 0);
         int minor = BitConverter.ToInt32(byteBuffer, 4);
-#endif
 
         return new Version(major, minor);
     }
