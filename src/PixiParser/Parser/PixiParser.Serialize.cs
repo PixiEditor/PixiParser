@@ -27,11 +27,7 @@ public partial class PixiParser
     public static async Task SerializeAsync(Document document, string path,
         CancellationToken cancellationToken = default)
     {
-#if NET5_0_OR_GREATER
-        await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
-#else
         using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
-#endif
         await SerializeAsync(document, stream, cancellationToken).ConfigureAwait(false);
     }
 
@@ -43,11 +39,7 @@ public partial class PixiParser
 
         byte[] header = GetHeader();
 
-#if NET5_0_OR_GREATER
-        await stream.WriteAsync(header, cancellationToken).ConfigureAwait(false);
-#else
         await stream.WriteAsync(header, 0, header.Length, cancellationToken).ConfigureAwait(false);
-#endif
 
         if (stream.Position != HeaderLength)
         {
@@ -95,12 +87,8 @@ public partial class PixiParser
         foreach (var resource in resources)
         {
             cancellationToken.ThrowIfCancellationRequested();
-#if NET5_0_OR_GREATER
-            await stream.WriteAsync(resource.ImageBytes.AsMemory(0, resource.ImageBytes.Length), cancellationToken).ConfigureAwait(false);
-#else
             await stream.WriteAsync(resource.ImageBytes, 0, resource.ImageBytes.Length, cancellationToken)
                 .ConfigureAwait(false);
-#endif
         }
     }
 
@@ -121,13 +109,8 @@ public partial class PixiParser
         {
             byte[] preview = document.PreviewImage;
 
-#if NET5_0_OR_GREATER
-            stream.Write(BitConverter.GetBytes(preview.Length));
-            stream.Write(preview);
-#else
             stream.Write(BitConverter.GetBytes(preview.Length), 0, sizeof(int));
             stream.Write(preview, 0, preview.Length);
-#endif
         }
         else
         {
