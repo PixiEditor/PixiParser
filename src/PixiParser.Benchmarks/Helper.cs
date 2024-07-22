@@ -1,6 +1,7 @@
 ﻿using PixiEditor.Parser.Skia;
 using SkiaSharp;
 using System;
+using PixiEditor.Parser.Deprecated;
 
 namespace PixiEditor.Parser.Benchmarks;
 

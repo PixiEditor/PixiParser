@@ -13,7 +13,7 @@ public class RasterKeyFrame : ITimeSpan, IGuid, ILayerGuid, IImageContainer, IKe
     [Key(2)]
     public Guid Guid { get; set; }
     [Key(3)]
-    public Guid LayerGuid { get; set; }
+    public Guid NodeId { get; set; }
 
     [IgnoreMember]
     public byte[] ImageBytes { get; set; }

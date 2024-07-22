@@ -1,4 +1,5 @@
 ﻿using MessagePack;
+using PixiEditor.Parser.Deprecated;
 
 namespace PixiEditor.Parser;
 

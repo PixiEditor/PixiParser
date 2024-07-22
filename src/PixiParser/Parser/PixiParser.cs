@@ -6,7 +6,7 @@ namespace PixiEditor.Parser;
 
 public static partial class PixiParser
 {
-    public static Version FileVersion { get; } = new(4, 0);
+    public static Version FileVersion { get; } = new(5, 0);
     
     public static Version MinSupportedVersion { get; } = new(4, 0);
 

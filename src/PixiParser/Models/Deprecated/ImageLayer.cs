@@ -3,7 +3,7 @@ using System.Diagnostics;
 using MessagePack;
 using PixiEditor.Parser.Helpers;
 
-namespace PixiEditor.Parser;
+namespace PixiEditor.Parser.Deprecated;
 
 [MessagePackObject]
 [DebuggerDisplay("'{Name, nq}' {Width}x{Height}")]

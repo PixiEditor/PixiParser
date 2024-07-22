@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MessagePack;
-using PixiEditor.Parser.Helpers;
 
 namespace PixiEditor.Parser;
 
@@ -51,14 +50,9 @@ public partial class PixiParser
             byte[] preview = document.PreviewImage;
             int previewLength = preview.Length;
 
-#if NET5_0_OR_GREATER
-            await stream.WriteAsync(BitConverter.GetBytes(previewLength), cancellationToken).ConfigureAwait(false);
-            await stream.WriteAsync(preview, cancellationToken).ConfigureAwait(false);
-#else
             await stream.WriteAsync(BitConverter.GetBytes(previewLength), 0, sizeof(int), cancellationToken)
                 .ConfigureAwait(false);
             await stream.WriteAsync(preview, 0, previewLength, cancellationToken).ConfigureAwait(false);
-#endif
         }
         else
         {
@@ -68,7 +62,7 @@ public partial class PixiParser
         cancellationToken.ThrowIfCancellationRequested();
 
 
-        var members = document.RootFolder?.GetChildrenRecursive().ToList() ?? new List<IStructureMember>();
+        var graph = document.Graph;
 
         if (document.ReferenceLayer != null)
         {
@@ -119,7 +113,7 @@ public partial class PixiParser
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var members = document.RootFolder?.GetChildrenRecursive().ToList() ?? new List<IStructureMember>();
+        List<IImageContainer> members = new();
 
         if (document.ReferenceLayer != null)
         {
@@ -127,7 +121,7 @@ public partial class PixiParser
         }
 
         var resources = GetStructureResources(members, cancellationToken);
-        if(document.AnimationData != null)
+        if (document.AnimationData != null)
         {
             resources.AddRange(document.AnimationData.KeyFrameGroups.GetKeyFrameResources(cancellationToken));
         }
@@ -153,7 +147,7 @@ public partial class PixiParser
         return header;
     }
 
-    private static List<IImageContainer> GetStructureResources(IEnumerable<IStructureMember> members,
+    private static List<IImageContainer> GetStructureResources(IEnumerable<IImageContainer> members,
         CancellationToken cancellationToken = default)
     {
         int resourceOffset = 0;
@@ -163,25 +157,12 @@ public partial class PixiParser
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (member is IImageContainer image)
+            member.ResourceOffset = resourceOffset;
+            member.ResourceSize = member.ImageBytes?.Length ?? 0;
+            resourceOffset += member.ResourceSize;
+            if (member.ResourceSize > 0)
             {
-                image.ResourceOffset = resourceOffset;
-                image.ResourceSize = image.ImageBytes?.Length ?? 0;
-                resourceOffset += image.ResourceSize;
-                if (image.ResourceSize > 0)
-                {
-                    resources.Add(image);
-                }
-            }
-
-            if (member is not IMaskable { Mask: IImageContainer maskImage }) continue;
-
-            maskImage.ResourceOffset = resourceOffset;
-            maskImage.ResourceSize = maskImage.ImageBytes?.Length ?? 0;
-            resourceOffset += maskImage.ResourceSize;
-            if (maskImage.ResourceSize > 0)
-            {
-                resources.Add(maskImage);
+                resources.Add(member);
             }
         }
 

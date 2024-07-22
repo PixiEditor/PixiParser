@@ -43,7 +43,7 @@ public class ParserTests
     }
 
     [Fact]
-    public void DetectOldFile() => Assert.Throws<OldFileFormatException>(() => DepractedPixiParser.Deserialize("./Files/OldPixiFile.pixi"));
+    public void DetectOldFile() => Assert.Throws<OldFileFormatException>(() => DeprecatedPixiParser.Deserialize("./Files/OldPixiFile.pixi"));
 
     [Fact]
     public void DetectCorruptedFile() => Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./Files/CorruptedPixiFile.pixi"));

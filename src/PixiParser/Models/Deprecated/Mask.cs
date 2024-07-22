@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using MessagePack;
 
-namespace PixiEditor.Parser;
+namespace PixiEditor.Parser.Deprecated;
 
 [MessagePackObject]
 [DebuggerDisplay("{Width}x{Height}")]

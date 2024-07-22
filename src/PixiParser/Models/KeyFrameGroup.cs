@@ -14,7 +14,7 @@ public class KeyFrameGroup : ILayerGuid, IKeyFrameChildrenContainer, IKeyFrame
     public List<IKeyFrame> Children { get; }
     
     [Key(2)]
-    public Guid LayerGuid { get; set; }
+    public Guid NodeId { get; set; }
     
     public KeyFrameGroup()
     {
@@ -22,10 +22,10 @@ public class KeyFrameGroup : ILayerGuid, IKeyFrameChildrenContainer, IKeyFrame
     }
     
     [SerializationConstructor]
-    internal KeyFrameGroup(bool enabled, List<IKeyFrame> children, Guid layerGuid)
+    internal KeyFrameGroup(bool enabled, List<IKeyFrame> children, Guid nodeId)
     {
         Enabled = enabled;
         Children = children;
-        LayerGuid = layerGuid;
+        NodeId = nodeId;
     }
 }

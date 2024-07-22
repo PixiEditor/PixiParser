@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Linq;
 using MessagePack;
 using PixiEditor.Parser.Collections;
+using PixiEditor.Parser.Deprecated;
+using PixiEditor.Parser.Graph;
 using PixiEditor.Parser.Helpers;
 
 namespace PixiEditor.Parser;
@@ -12,7 +14,7 @@ namespace PixiEditor.Parser;
 public sealed class Document
 {
     [IgnoreMember]
-    private string DebuggerDisplay => $"{Width}x{Height}, {RootFolder.GetChildrenRecursive().Count()} members";
+    private string DebuggerDisplay => $"{Width}x{Height}, {Graph.AllNodes.Count()} nodes";
     
     [IgnoreMember]
     private ColorCollection swatches;
@@ -79,7 +81,7 @@ public sealed class Document
     }
     
     [Key(4)]
-    public Folder RootFolder { get; set; }
+    public NodeGraph Graph { get; set; }
     
     [Key(5)]
     public ReferenceLayer ReferenceLayer { get; set; }

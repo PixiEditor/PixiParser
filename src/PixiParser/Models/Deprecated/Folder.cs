@@ -4,7 +4,7 @@ using System.Linq;
 using MessagePack;
 using PixiEditor.Parser.Helpers;
 
-namespace PixiEditor.Parser;
+namespace PixiEditor.Parser.Deprecated;
 
 [MessagePackObject]
 [DebuggerDisplay("{DebuggerDisplay,nq}")]

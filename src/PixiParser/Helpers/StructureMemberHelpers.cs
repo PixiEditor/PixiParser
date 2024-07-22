@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PixiEditor.Parser.Deprecated;
 
 namespace PixiEditor.Parser.Helpers;
 
