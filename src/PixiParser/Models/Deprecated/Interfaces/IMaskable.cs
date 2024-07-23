@@ -1,6 +1,4 @@
-﻿using PixiEditor.Parser.Deprecated;
-
-namespace PixiEditor.Parser;
+﻿namespace PixiEditor.Parser.Deprecated.Interfaces;
 
 /// <summary>
 /// A maskable structure member

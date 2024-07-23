@@ -1,7 +1,7 @@
-﻿using BenchmarkDotNet.Attributes;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
 
-namespace PixiEditor.Parser.Benchmarks;
+namespace PixiEditor.Parser.Benchmarks.Benchmarks;
 
 public partial class Benchmarks
 {

@@ -1,7 +1,8 @@
 using SkiaSharp;
 using System;
 using System.Linq;
-using PixiEditor.Parser.Helpers;
+using PixiEditor.Parser.Deprecated;
+using PixiEditor.Parser.Deprecated.Helpers;
 
 namespace PixiEditor.Parser.Skia;
 
@@ -22,19 +23,19 @@ public static class SkiaExtensions
     /// Encodes the <paramref name="bitmap"/> into the png bytes of the layer
     /// </summary>
     /// <param name="bitmap">The bitmap that should be encoded</param>
-    /// <returns><paramref name="layer"/></returns>
-    public static IImageContainer FromSKBitmap(this IImageContainer layer, SKBitmap bitmap)
+    /// <returns><paramref name="container"/></returns>
+    public static IImageContainer FromSKBitmap(this IImageContainer container, SKBitmap bitmap, ImageEncoder encoder)
     {
-        using var data = bitmap.Encode(SKEncodedImageFormat.Png, 100);
+        var data = encoder.Encode(bitmap.Bytes, bitmap.Width, bitmap.Height);
 
-        layer.ImageBytes = data.AsSpan().ToArray();
+        container.ImageBytes = data.AsSpan().ToArray();
 
-        if (layer is not ISize<int> size) return layer;
+        if (container is not ISize<int> size) return container;
         
         size.Width = bitmap.Width;
         size.Height = bitmap.Height;
 
-        return layer;
+        return container;
     }
 
     /// <summary>
@@ -42,18 +43,18 @@ public static class SkiaExtensions
     /// </summary>
     /// <param name="bitmap">The bitmap that should be encoded</param>
     /// <returns><paramref name="image"/></returns>
-    public static IImageContainer FromSKImage(this IImageContainer layer, SKImage image)
+    public static IImageContainer FromSKImage(this IImageContainer imageContainer, SKImage image, ImageEncoder encoder)
     {
-        using var data = image.Encode();
+        var data = encoder.Encode(image.EncodedData.ToArray(), image.Width, image.Height);
 
-        layer.ImageBytes = data.AsSpan().ToArray();
+        imageContainer.ImageBytes = data.AsSpan().ToArray();
         
-        if (layer is not ISize<int> size) return layer;
+        if (imageContainer is not ISize<int> size) return imageContainer;
         
         size.Width = image.Width;
         size.Height = image.Height;
 
-        return layer;
+        return imageContainer;
     }
 
     /// <summary>
@@ -61,7 +62,9 @@ public static class SkiaExtensions
     /// </summary>
     /// <param name="document"></param>
     /// <returns>The <see cref="SKBitmap"/> instance</returns>
-    public static SKBitmap LayersToSKBitmap(this Document document)
+    
+    [Obsolete("This is a helper method for the deprecated document model. Use the new document model instead.")]
+    public static SKBitmap LayersToSKBitmap(this DeprecatedDocument document)
     {
         SKImageInfo info = new(document.Width, document.Height, SKColorType.RgbaF32, SKAlphaType.Unpremul, SKColorSpace.CreateSrgb());
         using var surface = SKSurface.Create(info);

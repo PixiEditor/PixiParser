@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PixiEditor.Parser.Deprecated;
+using PixiEditor.Parser.Deprecated.Interfaces;
 
-namespace PixiEditor.Parser.Helpers;
+namespace PixiEditor.Parser.Deprecated.Helpers;
 
 public static class StructureMemberHelpers
 {
@@ -17,7 +17,7 @@ public static class StructureMemberHelpers
         variable = value;
     }
 
-    public static Stack<IStructureChildrenContainer> GetParents(this IStructureMember member, Document document) =>
+    public static Stack<IStructureChildrenContainer> GetParents(this IStructureMember member, DeprecatedDocument document) =>
         GetParents(member, document.RootFolder);
 
     public static Stack<IStructureChildrenContainer> GetParents(this IStructureMember member, IStructureChildrenContainer root)
@@ -41,11 +41,11 @@ public static class StructureMemberHelpers
         }
     }
     
-    public static float GetFinalOpacity(this IStructureOpacity member, Document document) =>
+    public static float GetFinalOpacity(this IStructureOpacity member, DeprecatedDocument document) =>
         member.Opacity == 0 ? 0 : member.GetParents(document).OfType<IStructureOpacity>()
             .Aggregate(member.Opacity, (current, parent) => current * parent.Opacity);
 
-    public static bool GetFinalVisibility(this IStructureMember member, Document document) =>
+    public static bool GetFinalVisibility(this IStructureMember member, DeprecatedDocument document) =>
         member.Enabled && member.GetParents(document).All(parent => parent.Enabled);
 
     public static IEnumerable<IStructureMember> GetChildrenRecursive(this IStructureChildrenContainer container)
@@ -63,7 +63,7 @@ public static class StructureMemberHelpers
         }
     }
 
-    internal static string GetDebugName(this IStructureMember member, Document document) =>
+    internal static string GetDebugName(this IStructureMember member, DeprecatedDocument document) =>
         GetDebugName(member, document.RootFolder.GetChildrenRecursive().Append(document.ReferenceLayer));
 
     internal static string GetDebugName(this IStructureMember member, IEnumerable<IStructureMember> rootFolder)

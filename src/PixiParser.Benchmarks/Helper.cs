@@ -1,13 +1,15 @@
 ﻿using PixiEditor.Parser.Skia;
 using SkiaSharp;
 using System;
+using System.Collections.Generic;
 using PixiEditor.Parser.Deprecated;
+using PixiEditor.Parser.Graph;
 
 namespace PixiEditor.Parser.Benchmarks;
 
 public static class Helper
 {
-    public static Document CreateDocument(int size, int layers, bool encodePng = true)
+    public static Document CreateDocument(int size, int layers, ImageEncoder? encoder) 
     {
         var benchmarkDocument = new Document()
         {
@@ -16,18 +18,14 @@ public static class Helper
         };
 
         benchmarkDocument.Swatches.Add(255, 255, 255, 255);
-        benchmarkDocument.RootFolder = new Folder();
+        benchmarkDocument.Graph = new NodeGraph();
+        benchmarkDocument.Graph.AllNodes = new List<Node>();
 
         for (int i = 0; i < layers; i++)
         {
-            var layer = new ImageLayer();
-
-            if (encodePng)
-            {
-                layer.FromSKBitmap(CreateSKBitmap(size));
-            }
-
-            benchmarkDocument.RootFolder.Children.Add(layer);
+            var layer = CreateImageNode(encoder != null ? CreateSKBitmap(size) : null, encoder); 
+            
+            benchmarkDocument.Graph.AllNodes.Add(layer);
         }
 
         return benchmarkDocument;
@@ -47,5 +45,28 @@ public static class Helper
         }
 
         return bitmap;
+    }
+
+    private static Node CreateImageNode(SKBitmap? bitmap, ImageEncoder? encoder)
+    {
+        Node node = new()
+        {
+            Name = "ImageNode",
+            UniqueNodeName = "ImageLayer",
+            Position = new Vector2() { X = 2, Y = 3 },
+            Id = 0,
+            AdditionalData = new Dictionary<string, object>()
+        };
+        
+        if (bitmap != null && encoder != null)
+        {
+            byte[] encoded = encoder.Encode(bitmap.Bytes, bitmap.Width, bitmap.Height);
+            node.AdditionalData["Images"] = new List<List<byte>>()
+            {
+                new(encoded)
+            };
+        }
+
+        return node;
     }
 }

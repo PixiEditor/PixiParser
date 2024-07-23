@@ -62,23 +62,22 @@ public partial class PixiParser
         cancellationToken.ThrowIfCancellationRequested();
 
 
-        var graph = document.Graph;
+        List<IImageContainer> imageContainers = new();
 
         if (document.ReferenceLayer != null)
         {
-            members.Add(document.ReferenceLayer);
+            imageContainers.Add(document.ReferenceLayer);
         }
-
-        var resources = GetStructureResources(members, cancellationToken);
-        if (document.AnimationData != null)
+        
+        if (document.Graph != null)
         {
-            resources.AddRange(document.AnimationData.KeyFrameGroups.GetKeyFrameResources(cancellationToken));
+            imageContainers.AddRange(document.Graph.CollectImageContainers());
         }
 
         await MessagePackSerializer.SerializeAsync(stream, document, MessagePackOptions, cancellationToken)
             .ConfigureAwait(false);
 
-        foreach (var resource in resources)
+        foreach (var resource in imageContainers)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await stream.WriteAsync(resource.ImageBytes, 0, resource.ImageBytes.Length, cancellationToken)
@@ -113,23 +112,22 @@ public partial class PixiParser
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        List<IImageContainer> members = new();
+        List<IImageContainer> imageContainers = new();
+        
+        if (document.Graph != null)
+        {
+            imageContainers.AddRange(document.Graph.CollectImageContainers());
+        }
 
         if (document.ReferenceLayer != null)
         {
-            members.Add(document.ReferenceLayer);
-        }
-
-        var resources = GetStructureResources(members, cancellationToken);
-        if (document.AnimationData != null)
-        {
-            resources.AddRange(document.AnimationData.KeyFrameGroups.GetKeyFrameResources(cancellationToken));
+            imageContainers.Add(document.ReferenceLayer);
         }
 
         var msg = MessagePackSerializer.Serialize(document, MessagePackOptions, cancellationToken);
         stream.Write(msg, 0, msg.Length);
 
-        foreach (var resource in resources)
+        foreach (var resource in imageContainers)
         {
             cancellationToken.ThrowIfCancellationRequested();
             stream.Write(resource.ImageBytes, 0, resource.ImageBytes.Length);
@@ -145,54 +143,6 @@ public partial class PixiParser
         WriteVersion(header, MinSupportedVersion, MagicLength + 8);
 
         return header;
-    }
-
-    private static List<IImageContainer> GetStructureResources(IEnumerable<IImageContainer> members,
-        CancellationToken cancellationToken = default)
-    {
-        int resourceOffset = 0;
-        List<IImageContainer> resources = new(members.Count() + 1);
-
-        foreach (var member in members)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            member.ResourceOffset = resourceOffset;
-            member.ResourceSize = member.ImageBytes?.Length ?? 0;
-            resourceOffset += member.ResourceSize;
-            if (member.ResourceSize > 0)
-            {
-                resources.Add(member);
-            }
-        }
-
-        return resources;
-    }
-
-    private static List<IImageContainer> GetKeyFrameResources(this IEnumerable<IKeyFrame> keyFrames,
-        CancellationToken cancellationToken = default)
-    {
-        List<IImageContainer> resources = new();
-
-        foreach (var frame in keyFrames)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (frame is KeyFrameGroup group && group.Children.Count > 0)
-            {
-                resources.AddRange(GetKeyFrameResources(group.Children, cancellationToken));
-            }
-
-            if (frame is not IImageContainer image) continue;
-
-            image.ResourceOffset = 0;
-            image.ResourceSize = image.ImageBytes?.Length ?? 0;
-            if (image.ResourceSize > 0)
-            {
-                resources.Add(image);
-            }
-        }
-
-        return resources;
     }
 
     private static void WriteVersion(byte[] buffer, Version version, int offset)

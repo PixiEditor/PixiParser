@@ -17,13 +17,14 @@
     <PackageId>PixiEditor.Parser.Skia</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>PixiParserLogo.png</PackageIcon>
-    <Version>2.0.0.2</Version>
+    <Version>4.0.0.0</Version>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageVersion>3.0.1</PackageVersion>
+    <PackageVersion>4.0.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.88.8" />
+    <PackageReference Include="Qoi.NetStandard" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

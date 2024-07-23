@@ -19,14 +19,11 @@ public class Node
     public Vector2 Position { get; set; }
     
     [Key(4)]
-    public NodePropertyValue[] InputPropertyValue { get; set; }
+    public NodePropertyValue[] InputPropertyValues { get; set; } 
     
     [Key(5)]
-    public NodePropertyValue[] OutputPropertyValues { get; set; }
-    
-    [Key(6)]
     public PropertyConnection[] InputConnections { get; set; }
     
-    [Key(7)]
+    [Key(6)]
     public Dictionary<string, object> AdditionalData { get; set; }
 }

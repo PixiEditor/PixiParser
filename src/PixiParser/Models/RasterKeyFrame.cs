@@ -4,7 +4,7 @@ using MessagePack;
 namespace PixiEditor.Parser;
 
 [MessagePackObject]
-public class RasterKeyFrame : ITimeSpan, IGuid, ILayerGuid, IImageContainer, IKeyFrame
+public class RasterKeyFrame : ITimeSpan, IGuid, ILayerGuid, IKeyFrame
 {
     [Key(0)]
     public int StartFrame { get; set; }
@@ -14,9 +14,4 @@ public class RasterKeyFrame : ITimeSpan, IGuid, ILayerGuid, IImageContainer, IKe
     public Guid Guid { get; set; }
     [Key(3)]
     public Guid NodeId { get; set; }
-
-    [IgnoreMember]
-    public byte[] ImageBytes { get; set; }
-    [Key(5)] int IImageContainer.ResourceOffset { get; set; }
-    [Key(6)] int IImageContainer.ResourceSize { get; set; }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using MessagePack;
-using PixiEditor.Parser.Helpers;
+using PixiEditor.Parser.Deprecated.Helpers;
 
 namespace PixiEditor.Parser;
 

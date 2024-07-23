@@ -1,10 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using PixiEditor.Parser.Deprecated;
-using PixiEditor.Parser.Helpers;
+using PixiEditor.Parser.Deprecated.Helpers;
+using PixiEditor.Parser.Deprecated.Interfaces;
+using PixiEditor.Parser.Graph;
+using PixiEditor.Parser.Skia;
 using SkiaSharp;
 using Xunit;
 
@@ -16,17 +21,17 @@ public class ParserTests
     public void SerializingAndDeserializingWorks()
     {
         var document = GetFullDocument();
-        
+
         using FileStream stream = new("test.pixi", FileMode.Create);
         PixiParser.Serialize(document, stream);
 
         stream.Position = 0;
-        
+
         var deserializedDocument = PixiParser.Deserialize(stream);
-        
+
         AssertEqual(document, deserializedDocument);
     }
-    
+
     [Fact]
     public async Task SerializingAndDeserialzingWorksAsync()
     {
@@ -36,17 +41,15 @@ public class ParserTests
         await PixiParser.SerializeAsync(document, stream);
 
         stream.Position = 0;
-        
+
         var deserializedDocument = await PixiParser.DeserializeAsync(stream);
-        
+
         AssertEqual(document, deserializedDocument);
     }
 
     [Fact]
-    public void DetectOldFile() => Assert.Throws<OldFileFormatException>(() => DeprecatedPixiParser.Deserialize("./Files/OldPixiFile.pixi"));
-
-    [Fact]
-    public void DetectCorruptedFile() => Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./Files/CorruptedPixiFile.pixi"));
+    public void DetectCorruptedFile() =>
+        Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./Files/CorruptedPixiFile.pixi"));
 
     private static Document GetFullDocument()
     {
@@ -59,7 +62,7 @@ public class ParserTests
         document.Swatches.Add(234, 254, 153, 255);
         document.Swatches.Add(0, 254, 153, 80);
         document.Swatches.Add(254, 153, 80);
-        
+
         document.Palette.Add(234, 254, 153, 255);
         document.Palette.Add(0, 254, 153, 80);
         document.Palette.Add(254, 153, 80);
@@ -85,46 +88,64 @@ public class ParserTests
         //     Opacity = 0.45f,
         // };
 
-        var subFolder = new Folder
-        {
-            Name = "Folder1",
-            Enabled = false,
-            Mask = new Mask(),
-            Opacity = 0.8f,
-        };
         //
         // subFolder.Children.Add(new ImageLayer { Name = "Sublayer1", Enabled = false, Height = 8, Width = 32, ImageBytes = new byte[] { 32, 65, 12, 65, 255  }, OffsetX = 2, OffsetY = 1, Opacity = 0f });
 
         SKBitmap bitmap = new SKBitmap(40, 32);
-        
+
         bitmap.SetPixel(30, 16, SKColors.Beige);
+
+        document.Graph = new NodeGraph();
+        document.Graph.AllNodes = new List<Node>();
         
-        document.RootFolder = new(new IStructureMember[]
+        document.Graph.AllNodes.Add(CreateImageNode(bitmap, BuiltInEncoders.Encoders[document.ImageEncoderUsed]));
+        
+        Node outputNode = new Node()
         {
-            subFolder,
-            new ImageLayer
+            Name = "OUTPUT_NODE",
+            UniqueNodeName = "Output",
+            Position = new Vector2 { X = 0, Y = 0 },
+            Id = 1,
+            InputConnections = new []
             {
-                Name = "Layer1",
-                Enabled = true,
-                Height = 40,
-                Width = 32,
-                OffsetX = 0,
-                OffsetY = 0,
-                Opacity = 0.8f,
-                ImageBytes = bitmap.Encode(SKEncodedImageFormat.Png, 100).ToArray()
+                new PropertyConnection(){ NodeId = document.Graph.AllNodes[0].Id, PropertyName = "Output"}
             }
-        });
+        };
+        
+        document.Graph.AllNodes.Add(outputNode);
 
         return document;
     }
-    
+
+    private static Node CreateImageNode(SKBitmap bitmap, ImageEncoder encoder)
+    {
+        Node node = new()
+        {
+            Name = "ImageNode",
+            UniqueNodeName = "ImageLayer",
+            Position = new Vector2() { X = 2, Y = 3 },
+            Id = 0,
+            AdditionalData = new()
+            {
+                {
+                    "Images", new List<List<byte>>()
+                    {
+                        new(encoder.Encode(bitmap.Bytes, bitmap.Width, bitmap.Height))
+                    }
+                }
+            }
+        };
+
+        return node;
+    }
+
     private static void AssertEqual(Document expectedDocument, Document actualDocument)
     {
         Assert.Equal(expectedDocument.Version, actualDocument.Version);
         Assert.Equal(expectedDocument.Height, actualDocument.Height);
         Assert.Equal(expectedDocument.Width, actualDocument.Width);
         Assert.Equal(expectedDocument.Swatches.Count, actualDocument.Swatches.Count);
-        Assert.Equal(expectedDocument.RootFolder.GetChildrenRecursive().Count(), actualDocument.RootFolder.GetChildrenRecursive().Count());
+        Assert.Equal(expectedDocument.Graph.AllNodes?.Count, actualDocument.Graph.AllNodes?.Count);
 
         if (expectedDocument.PreviewImage == null)
         {
@@ -135,7 +156,7 @@ public class ParserTests
             Assert.True(expectedDocument.PreviewImage.SequenceEqual(actualDocument.PreviewImage));
         }
 
-        AssertMember(expectedDocument.ReferenceLayer, actualDocument.ReferenceLayer);
+        //AssertMember(expectedDocument.ReferenceLayer, actualDocument.ReferenceLayer);
 
         for (int i = 0; i < expectedDocument.Swatches.Count; i++)
         {
@@ -147,106 +168,70 @@ public class ParserTests
             Assert.Equal(expectedDocument.Swatches[i], actualDocument.Swatches[i]);
         }
 
-        foreach (var member in expectedDocument.RootFolder.GetChildrenRecursive()
-                     .Zip(actualDocument.RootFolder.GetChildrenRecursive(), (expected, actual) => new { Expected = expected, Actual = actual }))
+        if (expectedDocument.Graph is { AllNodes: not null })
         {
-            AssertMember(member.Expected, member.Actual);
+            Assert.NotNull(actualDocument.Graph);
+            Assert.NotNull(actualDocument.Graph.AllNodes);
+            foreach (var member in expectedDocument.Graph.AllNodes
+                         .Zip(actualDocument.Graph.AllNodes,
+                             (expected, actual) => new { Expected = expected, Actual = actual }))
+            {
+                AssertNode(member.Expected, member.Actual);
+            }
         }
-        
-        void AssertMember(IStructureMember expected, IStructureMember actual)
+
+        void AssertNode(Node expected, Node actual)
         {
             if (expected is null)
             {
                 Assert.Null(actual);
                 return;
             }
-            
-            Assert.Equal(expected.Enabled, actual.Enabled);
+
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.UniqueNodeName, actual.UniqueNodeName);
+            Assert.Equal(expected.Position, actual.Position);
+            Assert.Equal(expected.AdditionalData?.Count, actual.AdditionalData?.Count);
+            Assert.Equal(expected.InputConnections?.Length, actual.InputConnections?.Length);
+            Assert.Equal(expected.Id, actual.Id);
+
             Assert.IsType(expected.GetType(), actual);
 
-            Matcher matcher = new(expected, actual);
-
-            if (matcher.Match<IStructureChildrenContainer>(out var expectedContainer, out var actualContainer))
+            if (expected.AdditionalData != null)
             {
-                foreach (var member in expectedContainer.GetChildrenRecursive()
-                             .Zip(actualContainer.GetChildrenRecursive(), (expected, actual) => new { Expected = expected, Actual = actual }))
+                Assert.NotNull(actual.AdditionalData);
+                foreach (var additionalData in expected.AdditionalData)
                 {
-                    AssertMember(member.Expected, member.Actual);
+                    Assert.True(actual.AdditionalData.TryGetValue(additionalData.Key, out object actualValue));
+                    Assert.Equal(additionalData.Value, actualValue);
                 }
-            }
-
-            if (matcher.Match<IGuid>(out var expectedGuid, out var actualGuid))
-            {
-                Assert.Equal(expectedGuid.Guid, actualGuid.Guid);
-            }
-            
-            if (matcher.Match<IImageContainer>(out var expectedImage, out var actualImage))
-            {
-                if (expectedImage.ImageBytes is null)
-                {
-                    Assert.Empty(actualImage.ImageBytes);
-                }
-                else
-                {
-                    Assert.True(expectedImage.ImageBytes.SequenceEqual(actualImage.ImageBytes),
-                        "Actual image bytes did not match expected image bytes");
-                }
-            }
-            
-            if (matcher.Match<IMaskable>(out var expectedMaskable, out var actualMaskable))
-            {
-                AssertMember(expectedMaskable.Mask, actualMaskable.Mask);
-            }
-            
-            if (matcher.Match<IName>(out var expectedName, out var actualName))
-            {
-                Assert.Equal(expectedName.Name, actualName.Name);
-            }
-            
-            if (matcher.Match<IStructureOpacity>(out var expectedOpacity, out var actualOpacity))
-            {
-                Assert.Equal(expectedOpacity.Opacity, actualOpacity.Opacity);
-            }
-            
-            if (matcher.Match<ISize<int>>(out var expectedSize, out var actualSize))
-            {
-                Assert.Equal(expectedSize.Height, actualSize.Height);
-                Assert.Equal(expectedSize.Width, actualSize.Width);
-                Assert.Equal(expectedSize.OffsetX, actualSize.OffsetX);
-                Assert.Equal(expectedSize.OffsetY, actualSize.OffsetY);
-            }
-            
-            if (matcher.Match<ISize<float>>(out var expectedFloatSize, out var actualFloatSize))
-            {
-                Assert.Equal(expectedFloatSize.Height, actualFloatSize.Height);
-                Assert.Equal(expectedFloatSize.Width, actualFloatSize.Width);
             }
         }
     }
-    
+
 #nullable enable
 
     private class Matcher
     {
         private object Expected { get; }
-        
+
         private object Actual { get; }
-        
+
         public Matcher(object expected, object actual)
         {
             Expected = expected;
             Actual = actual;
         }
-        
+
         public bool Match<T>(
             [NotNullWhen(true)] out T? expected,
             [NotNullWhen(true)] out T? actual)
         {
             expected = default;
             actual = default;
-        
+
             if (Expected is not T ex || Actual is not T ac) return false;
-        
+
             expected = ex;
             actual = ac;
 

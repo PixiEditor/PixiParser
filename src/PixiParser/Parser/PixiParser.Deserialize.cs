@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MessagePack;
-using PixiEditor.Parser.Helpers;
 
 namespace PixiEditor.Parser;
 
@@ -62,34 +61,24 @@ public partial class PixiParser
 
         document.PreviewImage = preview;
 
-        var members = document.RootFolder.GetChildrenRecursive().ToList();
+        List<IImageContainer> imageContainers = new(); 
+        
+        if(document.Graph != null)
+        {
+            imageContainers.AddRange(document.Graph.CollectImageContainers());
+        }
 
         if (document.ReferenceLayer != null)
         {
-            members.Add(document.ReferenceLayer);
+            imageContainers.Add(document.ReferenceLayer);
         }
 
-        foreach (var member in members)
+        foreach (var container in imageContainers)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            if (member is IImageContainer image)
-            {
-                ReadImage(stream, cancellationToken, image, document);
-            }
-
-            if (member is IMaskable { Mask: IImageContainer mask })
-            {
-                ReadImage(stream, cancellationToken, mask, document);
-            }
+            
+            ReadImage(stream, cancellationToken, container, document);
         }
-
-        if (document.AnimationData != null)
-        {
-            List<IKeyFrame> keyFrames = document.AnimationData.KeyFrameGroups.Cast<IKeyFrame>().ToList();
-            ReadKeyFrameImages(stream, cancellationToken, keyFrames, document);
-        }
-
 
         return document;
     }
@@ -135,73 +124,26 @@ public partial class PixiParser
 
         document.PreviewImage = preview;
 
-        var members = document.RootFolder.GetChildrenRecursive().ToList();
-
+        List<IImageContainer> imageContainers = new();
+        
+        if(document.Graph != null)
+        {
+            imageContainers.AddRange(document.Graph.CollectImageContainers());
+        }
+        
         if (document.ReferenceLayer != null)
         {
-            members.Add(document.ReferenceLayer);
+            imageContainers.Add(document.ReferenceLayer);
         }
-
-        foreach (var member in members)
+        
+        foreach (var container in imageContainers)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            if (member is IImageContainer image)
-            {
-                await ReadImageAsync(stream, cancellationToken, image, document);
-            }
-
-            if (member is IMaskable { Mask: IImageContainer mask })
-            {
-                await ReadImageAsync(stream, cancellationToken, mask, document);
-            }
-        }
-
-        if (document.AnimationData != null)
-        {
-            List<IKeyFrame> keyFrames = document.AnimationData.KeyFrameGroups.Cast<IKeyFrame>().ToList();
-            await ReadKeyFrameImagesAsync(stream, cancellationToken, keyFrames, document);
+            
+            await ReadImageAsync(stream, cancellationToken, container, document).ConfigureAwait(false);
         }
 
         return document;
-    }
-
-    private static async Task ReadKeyFrameImagesAsync(Stream stream, CancellationToken cancellationToken,
-        List<IKeyFrame> keyFrameGroups,
-        Document document)
-    {
-        foreach (var keyFrame in keyFrameGroups)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (keyFrame is IKeyFrameChildrenContainer container && container.Children.Count != 0)
-            {
-                await ReadKeyFrameImagesAsync(stream, cancellationToken, container.Children, document);
-            }
-
-            if (keyFrame is IImageContainer image)
-            {
-                await ReadImageAsync(stream, cancellationToken, image, document);
-            }
-        }
-    }
-    
-    private static void ReadKeyFrameImages(Stream stream, CancellationToken cancellationToken,
-        List<IKeyFrame> keyFrameGroups,
-        Document document)
-    {
-        foreach (var keyFrame in keyFrameGroups)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (keyFrame is IKeyFrameChildrenContainer container && container.Children.Count != 0)
-            {
-                ReadKeyFrameImages(stream, cancellationToken, container.Children, document);
-            }
-
-            if (keyFrame is IImageContainer image)
-            {
-                ReadImage(stream, cancellationToken, image, document);
-            }
-        }
     }
 
     private static async Task ReadImageAsync(Stream stream, CancellationToken cancellationToken, IImageContainer image,

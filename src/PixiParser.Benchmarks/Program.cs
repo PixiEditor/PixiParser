@@ -1,6 +1,6 @@
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
-using PixiEditor.Parser.Benchmarks;
+using PixiEditor.Parser.Benchmarks.Benchmarks;
+
 //
 // var marks = new Benchmarks();
 //
