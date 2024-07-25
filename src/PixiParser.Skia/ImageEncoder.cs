@@ -17,5 +17,5 @@ public abstract class ImageEncoder
     /// </summary>
     /// <param name="encodedData">The compressed data to decode.</param>
     /// <returns>The raw pixel data.</returns>
-    public abstract byte[] Decode(byte[] encodedData, out SKColorType colorType, out SKAlphaType alphaType);
+    public abstract byte[] Decode(byte[] encodedData, out SKImageInfo info);
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using MessagePack;
 
 namespace PixiEditor.Parser.Graph;
@@ -6,8 +8,7 @@ namespace PixiEditor.Parser.Graph;
 [MessagePackObject]
 public class NodeGraph
 {
-    [Key(0)]
-    public List<Node> AllNodes { get; set; } 
+    [Key(0)] public List<Node> AllNodes { get; set; }
 
     public IImageContainer[] CollectImageContainers()
     {
@@ -29,14 +30,29 @@ public class NodeGraph
             {
                 foreach (var additionalData in node.AdditionalData)
                 {
-                    if (additionalData.Value is IImageContainer imageContainer)
+                    if (additionalData.Value is IEnumerable enumerable)
                     {
-                        imageContainers.Add(imageContainer);
+                        foreach (var item in enumerable)
+                        {
+                            TryAddImageContainer(item, imageContainers);
+                        }
+                    }
+                    else
+                    {
+                        TryAddImageContainer(additionalData.Value, imageContainers);
                     }
                 }
             }
         }
 
         return imageContainers.ToArray();
+    }
+
+    private static void TryAddImageContainer(object value, List<IImageContainer> imageContainers)
+    {
+        if (value is IImageContainer imageContainer)
+        {
+            imageContainers.Add(imageContainer);
+        }
     }
 }

@@ -25,5 +25,8 @@ public class Node
     public PropertyConnection[] InputConnections { get; set; }
     
     [Key(6)]
+    public KeyFrameData[] KeyFrames { get; set; }
+    
+    [Key(7)]
     public Dictionary<string, object> AdditionalData { get; set; }
 }

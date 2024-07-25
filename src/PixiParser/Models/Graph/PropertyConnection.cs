@@ -6,8 +6,11 @@ namespace PixiEditor.Parser.Graph;
 public class PropertyConnection
 {
     [Key(0)]
-    public int NodeId { get; set; }
+    public int OutputNodeId { get; set; }
 
     [Key(1)] 
-    public string PropertyName { get; set; }
+    public string InputPropertyName { get; set; }
+    
+    [Key(2)]
+    public string OutputPropertyName { get; set; }
 }

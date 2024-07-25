@@ -38,7 +38,7 @@ public class PngEncoder : ImageEncoder
     /// </summary>
     /// <param name="encodedData">The PNG data to decode.</param>
     /// <returns>The raw pixel data as a byte array.</returns>
-    public override byte[] Decode(byte[] encodedData)
+    public override byte[] Decode(byte[] encodedData, out SKImageInfo info)
     {
         // Validate input
         if (encodedData == null)
@@ -47,7 +47,7 @@ public class PngEncoder : ImageEncoder
         using var data = SKData.CreateCopy(encodedData);
         using var codec = SKCodec.Create(data);
         // Get image info
-        var info = codec.Info;
+        info = codec.Info;
         var bitmap = new SKBitmap(info.Width, info.Height, info.ColorType, info.AlphaType);
 
         // Decode the PNG data into the bitmap

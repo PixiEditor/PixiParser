@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MessagePack;
 
 namespace PixiEditor.Parser;
 
 [MessagePackObject]
-public class KeyFrameGroup : ILayerGuid, IKeyFrameChildrenContainer, IKeyFrame
+public class KeyFrameGroup
 {
     [Key(0)]
     public bool Enabled { get; set; }
     
     [Key(1)]
-    public List<IKeyFrame> Children { get; }
+    public List<ElementKeyFrame> Children { get; }
     
     [Key(2)]
-    public Guid NodeId { get; set; }
+    public int NodeId { get; set; }
     
     public KeyFrameGroup()
     {
-        Children = new List<IKeyFrame>();
+        Children = new List<ElementKeyFrame>();
     }
     
     [SerializationConstructor]
-    internal KeyFrameGroup(bool enabled, List<IKeyFrame> children, Guid nodeId)
+    internal KeyFrameGroup(bool enabled, List<ElementKeyFrame> children, int nodeId)
     {
         Enabled = enabled;
         Children = children;
