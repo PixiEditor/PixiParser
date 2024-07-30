@@ -8,4 +8,7 @@ public sealed class AnimationData
 {
     [Key(0)]
     public List<KeyFrameGroup> KeyFrameGroups { get; set; }
+    
+    [Key(1)]
+    public int FrameRate { get; set; }
 }
