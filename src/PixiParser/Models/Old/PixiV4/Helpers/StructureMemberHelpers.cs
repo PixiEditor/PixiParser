@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PixiEditor.Parser.Deprecated.Interfaces;
+using PixiEditor.Parser.Old.PixiV4.Interfaces;
 
-namespace PixiEditor.Parser.Deprecated.Helpers;
+namespace PixiEditor.Parser.Old.PixiV4.Helpers;
 
 public static class StructureMemberHelpers
 {

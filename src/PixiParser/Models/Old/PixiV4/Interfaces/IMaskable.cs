@@ -1,4 +1,4 @@
-﻿namespace PixiEditor.Parser.Deprecated.Interfaces;
+﻿namespace PixiEditor.Parser.Old.PixiV4.Interfaces;
 
 /// <summary>
 /// A maskable structure member

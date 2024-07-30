@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Linq;
 using MessagePack;
-using PixiEditor.Parser.Deprecated.Helpers;
-using PixiEditor.Parser.Deprecated.Interfaces;
+using PixiEditor.Parser.Old.PixiV4.Helpers;
+using PixiEditor.Parser.Old.PixiV4.Interfaces;
 
-namespace PixiEditor.Parser.Deprecated;
+namespace PixiEditor.Parser.Old.PixiV4;
 
 [MessagePackObject]
 [DebuggerDisplay("{DebuggerDisplay,nq}")]

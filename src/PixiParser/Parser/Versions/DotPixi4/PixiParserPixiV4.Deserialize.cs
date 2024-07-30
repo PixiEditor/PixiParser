@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using PixiEditor.Parser.Deprecated;
-using PixiEditor.Parser.Deprecated.Helpers;
-using PixiEditor.Parser.Deprecated.Interfaces;
+using PixiEditor.Parser.Old.PixiV4;
+using PixiEditor.Parser.Old.PixiV4.Helpers;
+using PixiEditor.Parser.Old.PixiV4.Interfaces;
 
 namespace PixiEditor.Parser.Versions.DotPixi4;
 

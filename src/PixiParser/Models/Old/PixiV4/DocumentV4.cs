@@ -2,9 +2,9 @@
 using System.Linq;
 using MessagePack;
 using PixiEditor.Parser.Collections;
-using PixiEditor.Parser.Deprecated.Helpers;
+using PixiEditor.Parser.Old.PixiV4.Helpers;
 
-namespace PixiEditor.Parser.Deprecated;
+namespace PixiEditor.Parser.Old.PixiV4;
 
 public sealed class DocumentV4 : IPixiDocument
 {

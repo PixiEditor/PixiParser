@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using MessagePack;
-using PixiEditor.Parser.Deprecated;
+using PixiEditor.Parser.Old.PixiV4;
 using PixiEditor.Parser.Versions.DotPixi4;
 using PixiEditor.Parser.Versions.DotPixi5;
 

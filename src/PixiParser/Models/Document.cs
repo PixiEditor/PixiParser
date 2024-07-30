@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using MessagePack;
 using PixiEditor.Parser.Collections;
-using PixiEditor.Parser.Deprecated;
 using PixiEditor.Parser.Graph;
 
 namespace PixiEditor.Parser;

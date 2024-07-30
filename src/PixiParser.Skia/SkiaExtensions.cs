@@ -1,8 +1,8 @@
 using SkiaSharp;
 using System;
 using System.Linq;
-using PixiEditor.Parser.Deprecated;
-using PixiEditor.Parser.Deprecated.Helpers;
+using PixiEditor.Parser.Old.PixiV4;
+using PixiEditor.Parser.Old.PixiV4.Helpers;
 
 namespace PixiEditor.Parser.Skia;
 

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using MessagePack;
-using PixiEditor.Parser.Deprecated.Helpers;
-using PixiEditor.Parser.Deprecated.Interfaces;
+using PixiEditor.Parser.Old.PixiV4.Helpers;
+using PixiEditor.Parser.Old.PixiV4.Interfaces;
 
-namespace PixiEditor.Parser.Deprecated;
+namespace PixiEditor.Parser.Old.PixiV4;
 
 [MessagePackObject]
 [DebuggerDisplay("'{Name, nq}' {Width}x{Height}")]
