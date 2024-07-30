@@ -4,7 +4,6 @@ using PixiEditor.Parser.Deprecated.Helpers;
 
 namespace PixiEditor.Parser.Deprecated;
 
-[Obsolete("PixiParser V4 uses new document model.")]
 public class ReferenceLayerV4 : IImageContainer, IName, ISize<float>, IStructureOpacity, IGuid
 {
     [IgnoreMember]

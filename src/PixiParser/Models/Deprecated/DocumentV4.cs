@@ -6,7 +6,6 @@ using PixiEditor.Parser.Deprecated.Helpers;
 
 namespace PixiEditor.Parser.Deprecated;
 
-[Obsolete("PixiParser V4 uses new document model.")]
 public sealed class DocumentV4 : IPixiDocument
 {
     [IgnoreMember] private string DebuggerDisplay => $"{Width}x{Height}, {RootFolder.GetChildrenRecursive().Count()} members";
