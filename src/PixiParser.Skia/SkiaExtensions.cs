@@ -64,7 +64,7 @@ public static class SkiaExtensions
     /// <returns>The <see cref="SKBitmap"/> instance</returns>
     
     [Obsolete("This is a helper method for the deprecated document model. Use the new document model instead.")]
-    public static SKBitmap LayersToSKBitmap(this DeprecatedDocument document)
+    public static SKBitmap LayersToSKBitmap(this DocumentV4 document)
     {
         SKImageInfo info = new(document.Width, document.Height, SKColorType.RgbaF32, SKAlphaType.Unpremul, SKColorSpace.CreateSrgb());
         using var surface = SKSurface.Create(info);

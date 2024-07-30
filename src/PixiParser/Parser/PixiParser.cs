@@ -31,7 +31,7 @@ public abstract class PixiParser
 
     public static PixiParser<Document> V5 { get; } = new PixiParserPixiV5();
 
-    public static PixiParser<DeprecatedDocument> V4 { get; } = new PixiParserPixiV4();
+    public static PixiParser<DocumentV4> V4 { get; } = new PixiParserPixiV4();
 
     public static IPixiDocument DeserializeUsingCompatible(Stream stream)
     {

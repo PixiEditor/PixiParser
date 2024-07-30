@@ -16,7 +16,7 @@ namespace PixiEditor.Parser.Versions.DotPixi4;
 /// </summary>
 internal partial class PixiParserPixiV4
 {
-    public override DeprecatedDocument Deserialize(Stream stream, CancellationToken cancellationToken = default)
+    public override DocumentV4 Deserialize(Stream stream, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -30,11 +30,11 @@ internal partial class PixiParserPixiV4
 
         byte[] preview = ReadPreview(stream, false);
 
-        DeprecatedDocument document;
+        DocumentV4 document;
 
         try
         {
-            document = MessagePackSerializer.Deserialize<DeprecatedDocument>(stream, MessagePackOptions, cancellationToken);
+            document = MessagePackSerializer.Deserialize<DocumentV4>(stream, MessagePackOptions, cancellationToken);
         }
         catch (Exception e)
         {
@@ -101,7 +101,7 @@ internal partial class PixiParserPixiV4
         return document;
     }
 
-    public override async Task<DeprecatedDocument> DeserializeAsync(Stream stream,
+    public override async Task<DocumentV4> DeserializeAsync(Stream stream,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -124,12 +124,12 @@ internal partial class PixiParserPixiV4
 
         byte[] preview = await ReadPreviewAsync(stream, cancellationToken, false).ConfigureAwait(false);
 
-        DeprecatedDocument document;
+        DocumentV4 document;
 
         try
         {
             document = await MessagePackSerializer
-                .DeserializeAsync<DeprecatedDocument>(stream, MessagePackOptions, cancellationToken).ConfigureAwait(false);
+                .DeserializeAsync<DocumentV4>(stream, MessagePackOptions, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -212,12 +212,12 @@ internal partial class PixiParserPixiV4
     private void ThrowInvalidMessagePack((Version version, Version minVersion) version, Exception e) =>
         throw new InvalidFileException("Failed to deserialize message pack of document", e)
         {
-            Document = new DeprecatedDocument { Version = version.version, MinVersion = version.minVersion },
+            Document = new DocumentV4 { Version = version.version, MinVersion = version.minVersion },
             Parser = this
         };
 
     private void
-        ThrowInvalidResourceSize(IImageContainer member, DeprecatedDocument document, int totalRead,
+        ThrowInvalidResourceSize(IImageContainer member, DocumentV4 document, int totalRead,
             IEnumerable<IStructureMember> members, Stream stream) => throw new InvalidFileException(
         $"Expected to read {member.ResourceSize} bytes, but only read {totalRead} bytes for layer {member.GetDebugName(members) ?? "{null}"}. Expected at offset {member.ResourceSize} with the size {member.ResourceSize} (Current Stream Position: {stream.Position}).")
     {

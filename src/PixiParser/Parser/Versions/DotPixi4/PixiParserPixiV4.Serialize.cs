@@ -13,7 +13,7 @@ namespace PixiEditor.Parser.Versions.DotPixi4;
 
 internal partial class PixiParserPixiV4
 {
-    public override async Task SerializeAsync(DeprecatedDocument document, Stream stream, CancellationToken cancellationToken = default)
+    public override async Task SerializeAsync(DocumentV4 document, Stream stream, CancellationToken cancellationToken = default)
     {
         document.Version = FileVersion;
         document.MinVersion = MinSupportedVersion;
@@ -75,7 +75,7 @@ internal partial class PixiParserPixiV4
         }
     }
 
-    public override void Serialize(DeprecatedDocument document, Stream stream, CancellationToken cancellationToken = default)
+    public override void Serialize(DocumentV4 document, Stream stream, CancellationToken cancellationToken = default)
     {
         document.Version = FileVersion;
         document.MinVersion = MinSupportedVersion;

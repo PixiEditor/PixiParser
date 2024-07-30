@@ -7,7 +7,7 @@ using PixiEditor.Parser.Deprecated.Helpers;
 namespace PixiEditor.Parser.Deprecated;
 
 [Obsolete("PixiParser V4 uses new document model.")]
-public sealed class DeprecatedDocument : IPixiDocument
+public sealed class DocumentV4 : IPixiDocument
 {
     [IgnoreMember] private string DebuggerDisplay => $"{Width}x{Height}, {RootFolder.GetChildrenRecursive().Count()} members";
 
@@ -76,7 +76,7 @@ public sealed class DeprecatedDocument : IPixiDocument
     public Folder RootFolder { get; set; }
 
     [Key(5)] 
-    public DeprecatedReferenceLayer ReferenceLayer { get; set; }
+    public ReferenceLayerV4 ReferenceLayer { get; set; }
 
     private ColorCollection GetColorCollection(ref ColorCollection variable)
     {
