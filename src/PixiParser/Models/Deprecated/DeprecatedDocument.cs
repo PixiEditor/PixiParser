@@ -7,9 +7,9 @@ using PixiEditor.Parser.Deprecated.Helpers;
 namespace PixiEditor.Parser.Deprecated;
 
 [Obsolete("PixiParser V4 uses new document model.")]
-public sealed class DeprecatedDocument
+public sealed class DeprecatedDocument : IPixiDocument
 {
-    [IgnoreMember] private string DebuggerDisplay => $"{Width}x{Height}, {RootFolder.GetChildrenRecursive().Count()} nodes";
+    [IgnoreMember] private string DebuggerDisplay => $"{Width}x{Height}, {RootFolder.GetChildrenRecursive().Count()} members";
 
     [IgnoreMember] private ColorCollection swatches;
     [IgnoreMember] private ColorCollection palette;
@@ -87,4 +87,6 @@ public sealed class DeprecatedDocument
 
         return variable;
     }
+
+    public IPixiParser GetParser() => PixiParser.V4;
 }

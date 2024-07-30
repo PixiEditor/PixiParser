@@ -10,7 +10,7 @@ namespace PixiEditor.Parser;
 
 [MessagePackObject]
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public sealed class Document
+public sealed class Document : IPixiDocument
 {
     [IgnoreMember]
     private string DebuggerDisplay => $"{Width}x{Height}, {Graph.AllNodes.Count()} nodes";
@@ -101,4 +101,6 @@ public sealed class Document
 
         return variable;
     }
+
+    public IPixiParser GetParser() => PixiParser.V5;
 }

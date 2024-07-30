@@ -1,42 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MessagePack;
 
-namespace PixiEditor.Parser;
+namespace PixiEditor.Parser.Versions.DotPixi5;
 
-public partial class PixiParser
+internal partial class PixiParserPixiV5
 {
-    public static void Serialize(Document document, string path, CancellationToken cancellationToken = default)
-    {
-        using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
-        Serialize(document, stream, cancellationToken);
-    }
-
-    public static byte[] Serialize(Document document, CancellationToken cancellationToken = default)
-    {
-        using var stream = new MemoryStream();
-        Serialize(document, stream, cancellationToken);
-        return stream.ToArray();
-    }
-
-    public static async Task SerializeAsync(Document document, string path,
-        CancellationToken cancellationToken = default)
-    {
-        using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
-        await SerializeAsync(document, stream, cancellationToken).ConfigureAwait(false);
-    }
-
-    public static async Task SerializeAsync(Document document, Stream stream,
+    public override async Task SerializeAsync(Document document, Stream stream,
         CancellationToken cancellationToken = default)
     {
         document.Version = FileVersion;
         document.MinVersion = MinSupportedVersion;
 
-        byte[] header = GetHeader();
+        byte[] header = GetHeaderForSerialization();
 
         await stream.WriteAsync(header, 0, header.Length, cancellationToken).ConfigureAwait(false);
 
@@ -65,12 +43,12 @@ public partial class PixiParser
             .ConfigureAwait(false);
     }
 
-    public static void Serialize(Document document, Stream stream, CancellationToken cancellationToken = default)
+    public override void Serialize(Document document, Stream stream, CancellationToken cancellationToken = default)
     {
         document.Version = FileVersion;
         document.MinVersion = MinSupportedVersion;
 
-        byte[] header = GetHeader();
+        byte[] header = GetHeaderForSerialization();
         stream.Write(header, 0, header.Length);
 
         if (stream.Position != HeaderLength)
@@ -92,22 +70,5 @@ public partial class PixiParser
 
         var msg = MessagePackSerializer.Serialize(document, MessagePackOptions, cancellationToken);
         stream.Write(msg, 0, msg.Length);
-    }
-
-    private static byte[] GetHeader()
-    {
-        byte[] header = new byte[HeaderLength];
-        Magic.CopyTo(header, 0);
-
-        WriteVersion(header, FileVersion, MagicLength);
-        WriteVersion(header, MinSupportedVersion, MagicLength + 8);
-
-        return header;
-    }
-
-    private static void WriteVersion(byte[] buffer, Version version, int offset)
-    {
-        BitConverter.GetBytes(version.Major).CopyTo(buffer, offset);
-        BitConverter.GetBytes(version.Minor).CopyTo(buffer, offset + 4);
     }
 }

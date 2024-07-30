@@ -3,7 +3,7 @@
 /// <summary>
 /// A member that has a bitmap
 /// </summary>
-public interface IImageContainer
+public interface IImageContainer : IStructureMember
 {
     /// <summary>
     /// A byte array containing the bytes for the png image
