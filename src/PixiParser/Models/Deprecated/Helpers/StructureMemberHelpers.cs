@@ -83,11 +83,6 @@ public static class StructureMemberHelpers
                 return $"Folder '{folder.Name}' [{i}]";
             }
             
-            if (member == children && member is ReferenceLayer reference)
-            {
-                return $"Reference '{reference.Name}' [{i}]";
-            }
-            
             if (member is Mask mask && children is IMaskable maskable && maskable.Mask == mask)
             {
                 return $"Mask of {maskable.GetDebugName(structureMembers)}";

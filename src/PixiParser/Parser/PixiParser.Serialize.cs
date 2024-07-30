@@ -61,28 +61,8 @@ public partial class PixiParser
 
         cancellationToken.ThrowIfCancellationRequested();
 
-
-        List<IImageContainer> imageContainers = new();
-
-        if (document.ReferenceLayer != null)
-        {
-            imageContainers.Add(document.ReferenceLayer);
-        }
-        
-        if (document.Graph != null)
-        {
-            imageContainers.AddRange(document.Graph.CollectImageContainers());
-        }
-
         await MessagePackSerializer.SerializeAsync(stream, document, MessagePackOptions, cancellationToken)
             .ConfigureAwait(false);
-
-        foreach (var resource in imageContainers)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            await stream.WriteAsync(resource.ImageBytes, 0, resource.ImageBytes.Length, cancellationToken)
-                .ConfigureAwait(false);
-        }
     }
 
     public static void Serialize(Document document, Stream stream, CancellationToken cancellationToken = default)
@@ -110,28 +90,8 @@ public partial class PixiParser
             stream.Write(new byte[4], 0, 4);
         }
 
-        cancellationToken.ThrowIfCancellationRequested();
-
-        List<IImageContainer> imageContainers = new();
-        
-        if (document.Graph != null)
-        {
-            imageContainers.AddRange(document.Graph.CollectImageContainers());
-        }
-
-        if (document.ReferenceLayer != null)
-        {
-            imageContainers.Add(document.ReferenceLayer);
-        }
-
         var msg = MessagePackSerializer.Serialize(document, MessagePackOptions, cancellationToken);
         stream.Write(msg, 0, msg.Length);
-
-        foreach (var resource in imageContainers)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            stream.Write(resource.ImageBytes, 0, resource.ImageBytes.Length);
-        }
     }
 
     private static byte[] GetHeader()

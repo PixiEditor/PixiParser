@@ -76,7 +76,7 @@ public sealed class DeprecatedDocument
     public Folder RootFolder { get; set; }
 
     [Key(5)] 
-    public ReferenceLayer ReferenceLayer { get; set; }
+    public DeprecatedReferenceLayer ReferenceLayer { get; set; }
 
     private ColorCollection GetColorCollection(ref ColorCollection variable)
     {

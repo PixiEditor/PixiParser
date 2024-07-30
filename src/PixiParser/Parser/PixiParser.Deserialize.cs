@@ -61,25 +61,6 @@ public partial class PixiParser
 
         document.PreviewImage = preview;
 
-        List<IImageContainer> imageContainers = new(); 
-        
-        if(document.Graph != null)
-        {
-            imageContainers.AddRange(document.Graph.CollectImageContainers());
-        }
-
-        if (document.ReferenceLayer != null)
-        {
-            imageContainers.Add(document.ReferenceLayer);
-        }
-
-        foreach (var container in imageContainers)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            
-            ReadImage(stream, cancellationToken, container, document);
-        }
-
         return document;
     }
 
@@ -124,70 +105,7 @@ public partial class PixiParser
 
         document.PreviewImage = preview;
 
-        List<IImageContainer> imageContainers = new();
-        
-        if(document.Graph != null)
-        {
-            imageContainers.AddRange(document.Graph.CollectImageContainers());
-        }
-        
-        if (document.ReferenceLayer != null)
-        {
-            imageContainers.Add(document.ReferenceLayer);
-        }
-        
-        foreach (var container in imageContainers)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            
-            await ReadImageAsync(stream, cancellationToken, container, document).ConfigureAwait(false);
-        }
-
         return document;
-    }
-
-    private static async Task ReadImageAsync(Stream stream, CancellationToken cancellationToken, IImageContainer image,
-        Document document)
-    {
-        int bytesRead;
-        int totalRead = 0;
-        image.ImageBytes = new byte[image.ResourceSize];
-
-        bytesRead = 0;
-        do
-        {
-            bytesRead = await stream
-                .ReadAsync(image.ImageBytes, 0, image.ImageBytes.Length - bytesRead, cancellationToken)
-                .ConfigureAwait(false);
-            cancellationToken.ThrowIfCancellationRequested();
-            totalRead += bytesRead;
-        } while (bytesRead > 0);
-
-        if (totalRead != image.ResourceSize)
-        {
-            ThrowInvalidResourceSize(image, document, totalRead, stream);
-        }
-    }
-    
-    private static void ReadImage(Stream stream, CancellationToken cancellationToken, IImageContainer image,
-        Document document)
-    {
-        int bytesRead;
-        int totalRead = 0;
-        image.ImageBytes = new byte[image.ResourceSize];
-
-        bytesRead = 0;
-        do
-        {
-            bytesRead = stream.Read(image.ImageBytes, 0, image.ImageBytes.Length - bytesRead);
-            cancellationToken.ThrowIfCancellationRequested();
-            totalRead += bytesRead;
-        } while (bytesRead > 0);
-
-        if (totalRead != image.ResourceSize)
-        {
-            ThrowInvalidResourceSize(image, document, totalRead, stream);
-        }
     }
 
     private static (Version version, Version minVersion)? ValidateHeader(int bytesRead, ReadOnlySpan<byte> header,
@@ -225,14 +143,6 @@ public partial class PixiParser
         throw new InvalidFileException("Failed to deserialize message pack of document", e)
         {
             Document = new Document { Version = version.version, MinVersion = version.minVersion }
-        };
-
-    private static void
-        ThrowInvalidResourceSize(IImageContainer member, Document document, int totalRead, Stream stream) =>
-        throw new InvalidFileException(
-            $"Expected to read {member.ResourceSize} bytes, but only read {totalRead} bytes. Expected at offset {member.ResourceSize} with the size {member.ResourceSize} (Current Stream Position: {stream.Position}).")
-        {
-            Document = document
         };
 
     public static byte[] ReadPreview(Stream stream) => ReadPreview(stream, true);
