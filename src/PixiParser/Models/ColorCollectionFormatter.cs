@@ -15,15 +15,7 @@ internal class ColorCollectionFormatter : IMessagePackFormatter<ColorCollection>
             return;
         }
         
-        writer.WriteMapHeader(value.Count);
-        
-        foreach (var color in value)
-        {
-            writer.Write(color.A);
-            writer.Write(color.R);
-            writer.Write(color.G);
-            writer.Write(color.B);
-        }
+        writer.Write(value.ToByteArray());
     }
 
     public ColorCollection Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
@@ -33,18 +25,8 @@ internal class ColorCollectionFormatter : IMessagePackFormatter<ColorCollection>
             return null;
         }
 
-        int count = reader.ReadMapHeader();
-        var colors = new ColorCollection(count);
+        var data = reader.ReadRaw();
         
-        for (int i = 0; i < count; i++)
-        {
-            byte a = reader.ReadByte();
-            byte r = reader.ReadByte();
-            byte g = reader.ReadByte();
-            byte b = reader.ReadByte();
-            colors.Add(Color.FromArgb(a, r, g, b));
-        }
-
-        return colors;
+        return ColorCollection.FromByteSequence(data.Slice(2));
     }
 }

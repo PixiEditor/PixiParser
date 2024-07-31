@@ -19,10 +19,6 @@ public abstract class PixiParser
     
     public static Version MinSupportedVersion { get; } = new(4, 0);
 
-    protected static MessagePackSerializerOptions MessagePackOptions { get; } = MessagePackSerializerOptions.Standard
-        .WithSecurity(MessagePackSecurity.UntrustedData)
-        .WithResolver(Resolver.Instance);
-    
     protected static readonly byte[] Magic = [20, 50, 49, 58, 49];
     
     protected const int MagicLength = 5;

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using MessagePack;
 
 namespace PixiEditor.Parser.Collections;
@@ -92,7 +94,7 @@ public class ColorCollection : List<Color>
         return color;
     }
 
-    internal byte[] ToByteArray()
+    public byte[] ToByteArray()
     {
         if (Count == 0)
         {
@@ -115,25 +117,29 @@ public class ColorCollection : List<Color>
         return array;
     }
 
-    internal void FromByteArray(byte[] bytes)
+    public static ColorCollection FromByteSequence(ReadOnlySequence<byte> bytes)
     {
         if (bytes.Length % 4 != 0)
         {
             throw new ArgumentOutOfRangeException(nameof(bytes), "The length of the bytes must be a multiple of 4");
         }
 
-        Clear();
+        var collection = new ColorCollection((int)bytes.Length / 4);
 
-        Capacity = bytes.Length / 4;
-
+        Span<byte> buffer = stackalloc byte[4];
+        
         for (var sI = 0; sI < bytes.Length; sI += 4)
         {
-            var a = bytes[sI];
-            var r = bytes[sI + 1];
-            var g = bytes[sI + 2];
-            var b = bytes[sI + 3];
+            bytes.Slice(sI, 4).CopyTo(buffer);
+            
+            var a = buffer[0];
+            var r = buffer[1];
+            var g = buffer[2];
+            var b = buffer[3];
 
-            Add(a, r, g, b);
+            collection.Add(a, r, g, b);
         }
+
+        return collection;
     }
 }
