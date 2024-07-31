@@ -20,13 +20,13 @@ internal class ColorCollectionFormatter : IMessagePackFormatter<ColorCollection>
 
     public ColorCollection Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
     {
-        if (reader.TryReadNil())
+        var data = reader.ReadBytes();
+
+        if (data == null)
         {
             return null;
         }
-
-        var data = reader.ReadRaw();
         
-        return ColorCollection.FromByteSequence(data.Slice(2));
+        return ColorCollection.FromByteSequence(data.Value);
     }
 }
