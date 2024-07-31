@@ -121,7 +121,7 @@ public class ColorCollection : List<Color>
     {
         if (bytes.Length % 4 != 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(bytes), "The length of the bytes must be a multiple of 4");
+            throw new ArgumentOutOfRangeException(nameof(bytes), $"The length of the bytes must be a multiple of 4. Actual length is {bytes.Length}");
         }
 
         var collection = new ColorCollection((int)bytes.Length / 4);
