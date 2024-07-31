@@ -17,9 +17,9 @@
     <PackageId>PixiEditor.Parser.Skia</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>PixiParserLogo.png</PackageIcon>
-    <Version>4.0.0.0</Version>
+    <Version>5.0.0.0</Version>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageVersion>4.0.0</PackageVersion>
+    <PackageVersion>5.0.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
