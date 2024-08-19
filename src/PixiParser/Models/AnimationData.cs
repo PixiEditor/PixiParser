@@ -11,4 +11,7 @@ public sealed class AnimationData
     
     [Key(1)]
     public int FrameRate { get; set; }
+    
+    [Key(2)]
+    public int OnionFrames { get; set; }
 }
