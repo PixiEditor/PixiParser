@@ -14,4 +14,7 @@ public sealed class AnimationData
     
     [Key(2)]
     public int OnionFrames { get; set; }
+    
+    [Key(3)]
+    public double OnionOpacity { get; set; }
 }
