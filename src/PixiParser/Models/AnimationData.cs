@@ -11,10 +11,10 @@ public sealed class AnimationData
     
     [Key(1)]
     public int FrameRate { get; set; }
-    
-    [Key(2)]
-    public int OnionFrames { get; set; }
-    
-    [Key(3)]
-    public double OnionOpacity { get; set; }
+
+    [Key(2)] 
+    public int OnionFrames { get; set; } = 1;
+
+    [Key(3)] 
+    public double OnionOpacity { get; set; } = 50;
 }
