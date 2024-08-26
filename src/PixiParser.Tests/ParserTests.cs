@@ -1,13 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using PixiEditor.Parser.Deprecated;
-using PixiEditor.Parser.Deprecated.Helpers;
-using PixiEditor.Parser.Deprecated.Interfaces;
 using PixiEditor.Parser.Graph;
 using PixiEditor.Parser.Skia;
 using SkiaSharp;
@@ -23,11 +18,11 @@ public class ParserTests
         var document = GetFullDocument();
 
         using FileStream stream = new("test.pixi", FileMode.Create);
-        PixiParser.Serialize(document, stream);
+        PixiParser.V5.Serialize(document, stream);
 
         stream.Position = 0;
 
-        var deserializedDocument = PixiParser.Deserialize(stream);
+        var deserializedDocument = PixiParser.V5.Deserialize(stream);
 
         AssertEqual(document, deserializedDocument);
     }
@@ -38,18 +33,18 @@ public class ParserTests
         var document = GetFullDocument();
 
         await using FileStream stream = new("testAsync.pixi", FileMode.Create);
-        await PixiParser.SerializeAsync(document, stream);
+        await PixiParser.V5.SerializeAsync(document, stream);
 
         stream.Position = 0;
 
-        var deserializedDocument = await PixiParser.DeserializeAsync(stream);
+        var deserializedDocument = await PixiParser.V5.DeserializeAsync(stream);
 
         AssertEqual(document, deserializedDocument);
     }
 
     [Fact]
     public void DetectCorruptedFile() =>
-        Assert.Throws<InvalidFileException>(() => PixiParser.Deserialize("./Files/CorruptedPixiFile.pixi"));
+        Assert.Throws<InvalidFileException>(() => PixiParser.V5.Deserialize("./Files/CorruptedPixiFile.pixi"));
 
     private static Document GetFullDocument()
     {
@@ -108,7 +103,7 @@ public class ParserTests
             Id = 1,
             InputConnections = new []
             {
-                new PropertyConnection(){ NodeId = document.Graph.AllNodes[0].Id, PropertyName = "Output"}
+                new PropertyConnection(){ OutputNodeId = document.Graph.AllNodes[0].Id, InputPropertyName = "Output"}
             }
         };
         

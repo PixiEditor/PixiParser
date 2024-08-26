@@ -10,12 +10,12 @@ public partial class Benchmarks
     [Benchmark]
     public Document Deserialize()
     {
-        return PixiParser.Deserialize(benchmarkDocumentBytes);
+        return PixiParser.V5.Deserialize(benchmarkDocumentBytes);
     }
 
     [Benchmark]
     public async Task<Document> DeserializeAsync()
     {
-        return await PixiParser.DeserializeAsync("test.pixi");
+        return await PixiParser.V5.DeserializeAsync("test.pixi");
     }
 }

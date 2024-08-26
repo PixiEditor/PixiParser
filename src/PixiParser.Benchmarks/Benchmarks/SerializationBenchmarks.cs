@@ -12,7 +12,7 @@ public partial class Benchmarks
     [Benchmark]
     public byte[] Serialize()
     {
-        return PixiParser.Serialize(benchmarkDocument);
+        return PixiParser.V5.Serialize(benchmarkDocument);
     }
 
     [Benchmark]
@@ -31,6 +31,6 @@ public partial class Benchmarks
             };
         }
         
-        return PixiParser.Serialize(benchmarkDocument);
+        return PixiParser.V5.Serialize(benchmarkDocument);
     }
 }

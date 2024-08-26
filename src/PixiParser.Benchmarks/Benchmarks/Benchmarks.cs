@@ -22,7 +22,7 @@ public partial class Benchmarks
     public void Setup()
     {
         benchmarkDocument = Helper.CreateDocument(Size, Layers, Encoder == EncoderType.Png ? BuiltInEncoders.Encoders["PNG"] : BuiltInEncoders.Encoders["QOI"]);
-        benchmarkDocumentBytes = PixiParser.Serialize(benchmarkDocument);
+        benchmarkDocumentBytes = PixiParser.V5.Serialize(benchmarkDocument);
 
         bitmaps = new SkiaSharp.SKBitmap[Layers];
 
@@ -31,7 +31,7 @@ public partial class Benchmarks
             bitmaps[i] = Helper.CreateSKBitmap(Size);
         }
 
-        PixiParser.Serialize(benchmarkDocument, "./test.pixi");
+        PixiParser.V5.Serialize(benchmarkDocument, "./test.pixi");
     }
 }
 

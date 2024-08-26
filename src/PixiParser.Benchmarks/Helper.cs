@@ -2,7 +2,6 @@
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using PixiEditor.Parser.Deprecated;
 using PixiEditor.Parser.Graph;
 
 namespace PixiEditor.Parser.Benchmarks;
