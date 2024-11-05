@@ -6,6 +6,7 @@ using PixiEditor.Parser.Old.PixiV4.Helpers;
 
 namespace PixiEditor.Parser.Old.PixiV4;
 
+[MessagePackObject]
 public sealed class DocumentV4 : IPixiDocument
 {
     [IgnoreMember] private string DebuggerDisplay => $"{Width}x{Height}, {RootFolder.GetChildrenRecursive().Count()} members";
