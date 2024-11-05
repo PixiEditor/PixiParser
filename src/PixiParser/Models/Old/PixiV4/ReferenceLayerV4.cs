@@ -4,6 +4,7 @@ using PixiEditor.Parser.Old.PixiV4.Helpers;
 
 namespace PixiEditor.Parser.Old.PixiV4;
 
+[MessagePackObject]
 public class ReferenceLayerV4 : IImageContainer, IName, ISize<float>, IStructureOpacity, IGuid
 {
     [IgnoreMember]
