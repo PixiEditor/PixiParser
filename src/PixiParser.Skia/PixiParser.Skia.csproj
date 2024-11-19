@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="2.88.9-preview.1.1" />
+    <PackageReference Include="SkiaSharp" Version="3.118.0-preview.1.2" />
     <PackageReference Include="Qoi.NetStandard" Version="1.0.0" />
   </ItemGroup>
 
