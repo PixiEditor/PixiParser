@@ -85,6 +85,8 @@ public sealed class Document : IPixiDocument
     [Key(8)] public string SerializerName { get; set; }
 
     [Key(9)] public string SerializerVersion { get; set; }
+    
+    [Key(10)] public bool LegacyColorBlending { get; set; }
 
 
     private ColorCollection GetColorCollection(ref ColorCollection variable)
