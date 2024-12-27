@@ -125,7 +125,7 @@ public class ParserTests
                 {
                     "Images", new List<List<byte>>()
                     {
-                        new(encoder.Encode(bitmap.Bytes, bitmap.Width, bitmap.Height))
+                        new(encoder.Encode(bitmap.Bytes, bitmap.Width, bitmap.Height, true))
                     }
                 }
             }
