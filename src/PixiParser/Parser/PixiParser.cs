@@ -15,7 +15,7 @@ public abstract class PixiParser
 {
     internal PixiParser() { }
     
-    public static Version FileVersion { get; } = new(5, 0);
+    public static Version FileVersion { get; } = new(5, 1);
     
     public static Version MinSupportedVersion { get; } = new(4, 0);
 

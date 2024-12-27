@@ -10,7 +10,7 @@ public abstract class ImageEncoder
     /// </summary>
     /// <param name="rawBitmap">The raw pixel data to encode.</param>
     /// <returns>The encoded data.</returns>
-    public abstract byte[] Encode(byte[] rawBitmap, int width, int height);
+    public abstract byte[] Encode(byte[] rawBitmap, int width, int height, bool isSrgb);
     
     /// <summary>
     ///    Decodes compressed data into raw pixels.

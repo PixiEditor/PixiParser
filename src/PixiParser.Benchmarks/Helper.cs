@@ -59,7 +59,7 @@ public static class Helper
         
         if (bitmap != null && encoder != null)
         {
-            byte[] encoded = encoder.Encode(bitmap.Bytes, bitmap.Width, bitmap.Height);
+            byte[] encoded = encoder.Encode(bitmap.Bytes, bitmap.Width, bitmap.Height, true);
             node.AdditionalData["Images"] = new List<List<byte>>()
             {
                 new(encoded)

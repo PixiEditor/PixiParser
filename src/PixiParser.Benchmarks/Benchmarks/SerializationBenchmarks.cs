@@ -23,7 +23,7 @@ public partial class Benchmarks
         for (int i = 0; i < Layers; i++)
         {
             ImageEncoder encoder = Encoder == EncoderType.Png ? BuiltInEncoders.Encoders["PNG"] : BuiltInEncoders.Encoders["QOI"];
-            byte[] encoded = encoder.Encode(bitmaps[i].Bytes, bitmaps[i].Width, bitmaps[i].Height);
+            byte[] encoded = encoder.Encode(bitmaps[i].Bytes, bitmaps[i].Width, bitmaps[i].Height, true);
            
             document.Graph.AllNodes[i].AdditionalData["Images"] = new System.Collections.Generic.List<System.Collections.Generic.List<byte>>()
             {

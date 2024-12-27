@@ -26,7 +26,7 @@ public static class SkiaExtensions
     /// <returns><paramref name="container"/></returns>
     public static IImageContainer FromSKBitmap(this IImageContainer container, SKBitmap bitmap, ImageEncoder encoder)
     {
-        var data = encoder.Encode(bitmap.Bytes, bitmap.Width, bitmap.Height);
+        var data = encoder.Encode(bitmap.Bytes, bitmap.Width, bitmap.Height, bitmap.ColorSpace?.IsSrgb ?? true);
 
         container.ImageBytes = data.AsSpan().ToArray();
 
@@ -45,7 +45,7 @@ public static class SkiaExtensions
     /// <returns><paramref name="image"/></returns>
     public static IImageContainer FromSKImage(this IImageContainer imageContainer, SKImage image, ImageEncoder encoder)
     {
-        var data = encoder.Encode(image.EncodedData.ToArray(), image.Width, image.Height);
+        var data = encoder.Encode(image.EncodedData.ToArray(), image.Width, image.Height, image.ColorSpace?.IsSrgb ?? true);
 
         imageContainer.ImageBytes = data.AsSpan().ToArray();
         

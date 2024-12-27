@@ -20,7 +20,7 @@ public class EncoderTests
 
         foreach (var encoder in BuiltInEncoders.Encoders)
         {
-            byte[] encoded = encoder.Value.Encode(bitmap.Bytes, width, height);
+            byte[] encoded = encoder.Value.Encode(bitmap.Bytes, width, height, true);
             byte[] decoded = encoder.Value.Decode(encoded, out _);
         }
     }
