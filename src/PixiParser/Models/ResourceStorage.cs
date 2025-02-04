@@ -23,6 +23,7 @@ public class ResourceStorage
 
         try
         {
+            bool hasGuidName = Guid.TryParse(Path.GetFileNameWithoutExtension(filePath), out Guid cacheGuid);
             int handle = Resources.Count;
             Resources.Add(new EmbeddedResource
             {
@@ -30,6 +31,7 @@ public class ResourceStorage
                 FileName = Path.GetFileName(filePath),
                 Data = System.IO.File.ReadAllBytes(filePath),
                 SourcePath = filePath,
+                CacheId = hasGuidName ? cacheGuid : Guid.NewGuid()
             });
 
             return handle;
