@@ -88,6 +88,7 @@ public sealed class Document : IPixiDocument
     
     [Key(10)] public bool LegacyColorBlending { get; set; }
 
+    [Key(11)] public ResourceStorage Resources { get; set; }
 
     private ColorCollection GetColorCollection(ref ColorCollection variable)
     {
