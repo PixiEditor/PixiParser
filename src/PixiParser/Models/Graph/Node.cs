@@ -29,4 +29,7 @@ public class Node
     
     [Key(7)]
     public Dictionary<string, object> AdditionalData { get; set; }
+
+    [Key(8)]
+    public int? PairId { get; set; }
 }
