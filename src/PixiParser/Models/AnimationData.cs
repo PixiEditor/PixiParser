@@ -17,4 +17,6 @@ public sealed class AnimationData
 
     [Key(3)] 
     public double OnionOpacity { get; set; } = 50;
+
+    [Key(4)] public int DefaultEndFrame { get; set; } = -1;
 }
