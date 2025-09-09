@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using System;
+using SkiaSharp;
 
 namespace PixiEditor.Parser.Skia;
 
@@ -18,4 +19,6 @@ public abstract class ImageEncoder
     /// <param name="encodedData">The compressed data to decode.</param>
     /// <returns>The raw pixel data.</returns>
     public abstract byte[] Decode(byte[] encodedData, out SKImageInfo info);
+
+    public abstract byte[] Decode(Span<byte> encodedData, out SKImageInfo info);
 }
