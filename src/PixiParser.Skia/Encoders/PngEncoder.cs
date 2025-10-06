@@ -24,7 +24,8 @@ public class PngEncoder : ImageEncoder
         if (rawBitmap.Length != width * height * 4)
             throw new ArgumentException("Invalid raw bitmap size for the given dimensions.");
 
-        using var bitmap = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul, isSrgb ? SKColorSpace.CreateSrgb() : SKColorSpace.CreateSrgbLinear());
+        using var bitmap = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul,
+            isSrgb ? SKColorSpace.CreateSrgb() : SKColorSpace.CreateSrgbLinear());
         var ptr = bitmap.GetPixels();
         System.Runtime.InteropServices.Marshal.Copy(rawBitmap, 0, ptr, rawBitmap.Length);
 
@@ -39,6 +40,11 @@ public class PngEncoder : ImageEncoder
     /// <param name="encodedData">The PNG data to decode.</param>
     /// <returns>The raw pixel data as a byte array.</returns>
     public override byte[] Decode(byte[] encodedData, out SKImageInfo info)
+    {
+        return Decode(encodedData.AsSpan(), out info);
+    }
+
+    public override byte[] Decode(Span<byte> encodedData, out SKImageInfo info)
     {
         // Validate input
         if (encodedData == null)

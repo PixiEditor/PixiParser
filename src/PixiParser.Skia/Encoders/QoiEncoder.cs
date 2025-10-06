@@ -1,4 +1,5 @@
-﻿using Qoi.NetStandard;
+﻿using System;
+using Qoi.NetStandard;
 using SkiaSharp;
 
 namespace PixiEditor.Parser.Skia.Encoders;
@@ -20,4 +21,6 @@ public class QoiEncoder : ImageEncoder
 
         return decoded;
     }
+
+    public override byte[] Decode(Span<byte> encodedData, out SKImageInfo info) => Decode(encodedData.ToArray(), out info);
 }
