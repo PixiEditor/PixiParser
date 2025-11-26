@@ -21,5 +21,5 @@ public class Variable
     public double? Max { get; set; }
 
     [Key(5)]
-    public bool IsExposed { get; set; }
+    public bool IsExposed { get; set; } = true;
 }
