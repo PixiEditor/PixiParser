@@ -19,4 +19,7 @@ public class Variable
 
     [Key(4)]
     public double? Max { get; set; }
+
+    [Key(5)]
+    public bool IsExposed { get; set; }
 }
