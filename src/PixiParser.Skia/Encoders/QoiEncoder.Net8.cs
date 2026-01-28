@@ -25,7 +25,7 @@ public class QoiEncoder : ImageEncoder
             _ => throw new IndexOutOfRangeException($"QOI color space '{qoiImage.ColorSpace}' is not supported.")
         };
 
-        info = new SKImageInfo(qoiImage.Width, qoiImage.Height, SKColorType.Bgra8888, SKAlphaType.Premul, colorSpace);
+        info = new SKImageInfo(qoiImage.Width, qoiImage.Height, SKColorType.Rgba8888, SKAlphaType.Premul, colorSpace);
 
         return qoiImage.Data;
     }
