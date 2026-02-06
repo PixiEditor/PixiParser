@@ -19,4 +19,5 @@ public sealed class AnimationData
     public double OnionOpacity { get; set; } = 50;
 
     [Key(4)] public int DefaultEndFrame { get; set; } = -1;
+    [Key(5)] public bool FallbackAnimationToLayerImage { get; set; }
 }
