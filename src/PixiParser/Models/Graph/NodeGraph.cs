@@ -9,4 +9,5 @@ namespace PixiEditor.Parser.Graph;
 public class NodeGraph
 {
     [Key(0)] public List<Node> AllNodes { get; set; }
+    [Key(1)] public Blackboard Blackboard { get; set; }
 }
