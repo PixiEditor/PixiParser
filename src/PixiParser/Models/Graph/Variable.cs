@@ -22,4 +22,7 @@ public class Variable
 
     [Key(5)]
     public bool IsExposed { get; set; } = true;
+
+    [Key(6)]
+    public string Type { get; set; }
 }
