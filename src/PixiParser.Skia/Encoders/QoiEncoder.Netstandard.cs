@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NETSTANDARD
+using System;
 using Qoi.NetStandard;
 using SkiaSharp;
 
@@ -24,3 +25,4 @@ public class QoiEncoder : ImageEncoder
 
     public override byte[] Decode(Span<byte> encodedData, out SKImageInfo info) => Decode(encodedData.ToArray(), out info);
 }
+#endif
