@@ -4,8 +4,8 @@ using PixiEditor.Parser.Old.PixiV4.Helpers;
 
 namespace PixiEditor.Parser.Old.PixiV4;
 
-[MessagePackObject]
-public class ReferenceLayerV4 : IImageContainer, IName, ISize<float>, IStructureOpacity, IGuid
+[MessagePackObject(AllowPrivate = true)]
+public partial class ReferenceLayerV4 : IImageContainer, IName, ISize<float>, IStructureOpacity, IGuid
 {
     [IgnoreMember]
     private float _opacity = 1;
@@ -41,11 +41,9 @@ public class ReferenceLayerV4 : IImageContainer, IName, ISize<float>, IStructure
     [Key(7)]
     public Guid Guid { get; set; }
     
-    [Key(8)]
-    int IImageContainer.ResourceOffset { get; set; }
+    [Key(8)] public int ResourceOffset { get; set; }
     
-    [Key(9)]
-    int IImageContainer.ResourceSize { get; set; }
+    [Key(9)] public int ResourceSize { get; set; }
     
     [Key(10)]
     public bool Topmost { get; set; }

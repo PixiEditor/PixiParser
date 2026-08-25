@@ -3,9 +3,9 @@ using MessagePack;
 
 namespace PixiEditor.Parser.Old.PixiV4;
 
-[MessagePackObject]
+[MessagePackObject(AllowPrivate = true)]
 [DebuggerDisplay("{Width}x{Height}")]
-public sealed class Mask : IImageContainer, ISize<int>, IStructureMember
+public partial class Mask : IImageContainer, ISize<int>, IStructureMember
 {
     [Key(0)]
     public bool Enabled { get; set; }
@@ -28,9 +28,7 @@ public sealed class Mask : IImageContainer, ISize<int>, IStructureMember
     [Key(5)]
     public BlendMode BlendMode { get; set; }
 
-    [Key(6)]
-    int IImageContainer.ResourceOffset { get; set; }
+    [Key(6)] public int ResourceOffset { get; set; }
     
-    [Key(7)]
-    int IImageContainer.ResourceSize { get; set; }
+    [Key(7)] public int ResourceSize { get; set; }
 }

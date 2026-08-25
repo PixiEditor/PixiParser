@@ -5,6 +5,7 @@ using PixiEditor.Parser.Collections;
 
 namespace PixiEditor.Parser;
 
+[ExcludeFormatterFromSourceGeneratedResolver]
 internal class ColorCollectionFormatter : IMessagePackFormatter<ColorCollection>
 {
     public void Serialize(ref MessagePackWriter writer, ColorCollection value, MessagePackSerializerOptions options)
