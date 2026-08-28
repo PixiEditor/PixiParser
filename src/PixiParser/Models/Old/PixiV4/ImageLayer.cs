@@ -6,9 +6,9 @@ using PixiEditor.Parser.Old.PixiV4.Interfaces;
 
 namespace PixiEditor.Parser.Old.PixiV4;
 
-[MessagePackObject]
+[MessagePackObject(AllowPrivate = true)]
 [DebuggerDisplay("'{Name, nq}' {Width}x{Height}")]
-public sealed class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, IStructureOpacity, ISize<int>, IClipToLayerBelow, IStructureMember
+public partial class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, IStructureOpacity, ISize<int>, IClipToLayerBelow, IStructureMember
 {
     [IgnoreMember]
     private float _opacity = 1;
@@ -47,11 +47,9 @@ public sealed class ImageLayer : IImageContainer, IBlendMode, IName, IMaskable, 
         set => this.SetOpacity(ref _opacity, value);
     }
     
-    [Key(9)]
-    int IImageContainer.ResourceOffset { get; set; }
+    [Key(9)] public int ResourceOffset { get; set; }
 
-    [Key(10)]
-    int IImageContainer.ResourceSize { get; set; }
+    [Key(10)] public int ResourceSize { get; set; }
     
     [Key(11)]
     public bool ClipToMemberBelow { get; set; }
