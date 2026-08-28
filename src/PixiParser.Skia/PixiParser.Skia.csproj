@@ -24,6 +24,13 @@
 
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="3.118.0-preview.1.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="QoiSharpNoGC" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Qoi.NetStandard" Version="1.0.0" />
   </ItemGroup>
 
