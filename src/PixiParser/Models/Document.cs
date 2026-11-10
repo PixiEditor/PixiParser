@@ -90,6 +90,8 @@ public sealed class Document : IPixiDocument
 
     [Key(11)] public ResourceStorage Resources { get; set; }
 
+    [Key(12)] public float Dpi { get; set; } = 300;
+
     private ColorCollection GetColorCollection(ref ColorCollection variable)
     {
         if (variable is null)
