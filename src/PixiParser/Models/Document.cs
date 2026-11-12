@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using MessagePack;
@@ -91,6 +92,10 @@ public sealed class Document : IPixiDocument
     [Key(11)] public ResourceStorage Resources { get; set; }
 
     [Key(12)] public float Dpi { get; set; } = 300;
+
+    [Key(13)] public string MeasurementUnit { get; set; } = "px";
+
+    [Key(14)] public List<Guide> Guides { get; set; } = new List<Guide>();
 
     private ColorCollection GetColorCollection(ref ColorCollection variable)
     {
